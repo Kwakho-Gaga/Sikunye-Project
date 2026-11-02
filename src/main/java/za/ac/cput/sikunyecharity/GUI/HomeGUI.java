@@ -122,6 +122,7 @@ public class HomeGUI extends JFrame implements ActionListener {
         homeLabel.setFont(font2);
         projectLabel = new JLabel("Projects");
         projectLabel.setFont(font2);
+        AppNavigation.link(projectLabel, this, "Projects");
         beneficiariesLabel = new JLabel("Beneficiaries");
         beneficiariesLabel.setFont(font2);
         AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
@@ -188,6 +189,7 @@ public class HomeGUI extends JFrame implements ActionListener {
         projectLinkLabel = new JLabel("Projects");
         projectLinkLabel.setForeground(color2);
         projectLinkLabel.setFont(font4);
+        AppNavigation.link(projectLinkLabel, this, "Projects");
         beneficiariesLinkLabel = new JLabel("Beneficiaries");
         beneficiariesLinkLabel.setForeground(color2);
         beneficiariesLinkLabel.setFont(font4);

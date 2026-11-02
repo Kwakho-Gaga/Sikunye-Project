@@ -74,7 +74,7 @@ final class HomeFooter {
         addText(panel, "Quick Links", HEADING, null, current);
         addText(panel, "Home", LINK, "Home", current);
         addText(panel, "ItemsDonated", LINK, null, current);
-        addText(panel, "Projects", LINK, null, current);
+        addText(panel, "Projects", LINK, "Projects", current);
         addText(panel, "Beneficiaries", LINK, "Beneficiaries", current);
         addText(panel, "Donor", LINK, null, current);
         addText(panel, "DonationsRecieved", LINK, null, current);
