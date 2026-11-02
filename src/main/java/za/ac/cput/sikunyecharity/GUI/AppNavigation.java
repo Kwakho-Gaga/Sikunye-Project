@@ -30,6 +30,9 @@ public final class AppNavigation {
                 home.setGui();
                 next = home;
                 break;
+            case "Projects":
+                next = new ProjectsPage();
+                break;
             case "Beneficiaries":
                 next = new BeneficiariesMenu();
                 break;
