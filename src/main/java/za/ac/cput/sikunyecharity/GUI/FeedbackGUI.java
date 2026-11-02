@@ -248,20 +248,7 @@ public class FeedbackGUI extends JFrame implements ActionListener, ItemListener 
 
         mainPanel.add(userFormPanel);
 
-        JPanel page = new JPanel(new BorderLayout());
-        JPanel navigation = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 16));
-        navigation.setBackground(Color.WHITE);
-        JLabel homeLink = new JLabel("Home");
-        JLabel beneficiariesLink = new JLabel("Beneficiaries");
-        homeLink.setFont(font2);
-        beneficiariesLink.setFont(font2);
-        AppNavigation.link(homeLink, this, "Home");
-        AppNavigation.link(beneficiariesLink, this, "Beneficiaries");
-        navigation.add(homeLink);
-        navigation.add(beneficiariesLink);
-        page.add(navigation, BorderLayout.NORTH);
-        page.add(mainPanel, BorderLayout.CENTER);
-        this.setContentPane(page);
+        this.add(mainPanel);
     }
 
     private void setPlaceholder(JTextComponent field, String placeholder) {
