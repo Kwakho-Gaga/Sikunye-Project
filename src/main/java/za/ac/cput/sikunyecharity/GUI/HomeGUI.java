@@ -46,6 +46,7 @@ public class HomeGUI extends JFrame implements ActionListener {
     private JLabel charityNameLabel,
             homeLabel,
             projectLabel,
+            beneficiariesLabel,
             donorLabel,
             itemsDonatedLabel,
             donationRecievedLabel,
@@ -62,6 +63,7 @@ public class HomeGUI extends JFrame implements ActionListener {
     private JLabel homeLinkLabel;
     private JLabel itemsDonatedLinkLabel;
     private JLabel projectLinkLabel;
+    private JLabel beneficiariesLinkLabel;
     private JLabel donorLinkLabel;
     private JLabel donationRecievedLinkLabel;
     private JLabel contactLinkLabel;
@@ -120,6 +122,9 @@ public class HomeGUI extends JFrame implements ActionListener {
         homeLabel.setFont(font2);
         projectLabel = new JLabel("Projects");
         projectLabel.setFont(font2);
+        beneficiariesLabel = new JLabel("Beneficiaries");
+        beneficiariesLabel.setFont(font2);
+        AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
         donorLabel = new JLabel("Donor");
         donorLabel.setFont(font2);
         itemsDonatedLabel = new JLabel("ItemsDonated");
@@ -183,6 +188,10 @@ public class HomeGUI extends JFrame implements ActionListener {
         projectLinkLabel = new JLabel("Projects");
         projectLinkLabel.setForeground(color2);
         projectLinkLabel.setFont(font4);
+        beneficiariesLinkLabel = new JLabel("Beneficiaries");
+        beneficiariesLinkLabel.setForeground(color2);
+        beneficiariesLinkLabel.setFont(font4);
+        AppNavigation.link(beneficiariesLinkLabel, this, "Beneficiaries");
         donorLinkLabel = new JLabel("Donor");
         donorLinkLabel.setForeground(color2);
         donorLinkLabel.setFont(font4);
@@ -234,10 +243,11 @@ public class HomeGUI extends JFrame implements ActionListener {
         headerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
         headerPanel.setBorder(new MatteBorder(0, 0, 2, 0, color1));
 
-        mainPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 32, 18));
+        mainPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 18, 18));
         mainPanel.setOpaque(false);
         mainPanel.add(homeLabel);
         mainPanel.add(projectLabel);
+        mainPanel.add(beneficiariesLabel);
         mainPanel.add(donorLabel);
         mainPanel.add(itemsDonatedLabel);
         mainPanel.add(donationRecievedLabel);
@@ -249,7 +259,7 @@ public class HomeGUI extends JFrame implements ActionListener {
 //       headerPanel.add(charityNamePanel);
         headerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
         headerPanel.add(charityNameLabel);
-        headerPanel.add(Box.createRigidArea(new Dimension(365, 0)));
+        headerPanel.add(Box.createRigidArea(new Dimension(150, 0)));
         headerPanel.add(mainPanel);
 
         homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
@@ -290,12 +300,13 @@ public class HomeGUI extends JFrame implements ActionListener {
         charityInfoFooterPanel.add(Box.createRigidArea(new Dimension(20, 20)));
         charityInfoFooterPanel.add(charitySloganLabel);
 
-        quickLinksPanel.setLayout(new GridLayout(8, 1));
+        quickLinksPanel.setLayout(new GridLayout(9, 1));
         quickLinksPanel.setOpaque(false);
         quickLinksPanel.add(quickLinkLabel);
         quickLinksPanel.add(homeLinkLabel);
         quickLinksPanel.add(itemsDonatedLinkLabel);
         quickLinksPanel.add(projectLinkLabel);
+        quickLinksPanel.add(beneficiariesLinkLabel);
         quickLinksPanel.add(donorLinkLabel);
         quickLinksPanel.add(donationRecievedLinkLabel);
         quickLinksPanel.add(contactLinkLabel);
@@ -308,7 +319,7 @@ public class HomeGUI extends JFrame implements ActionListener {
         socialIconPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
 
         socialIconPanel.setOpaque(false);
-        URL facebookUrl = getClass().getResource("/facebook.png"
+        URL facebookUrl = getClass().getResource("/Facebook.png"
         );
         ImageIcon facebook = new ImageIcon(facebookUrl);
         JLabel facebookIcon = new JLabel(facebook);
