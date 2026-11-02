@@ -160,10 +160,10 @@ public class DonationED extends JFrame {
 
         navigation.setBorder(
                 new EmptyBorder(
-                        8,
-                        15,
-                        8,
-                        20
+                        12,
+                        30,
+                        12,
+                        24
                 )
         );
 
@@ -178,38 +178,11 @@ public class DonationED extends JFrame {
 
         logoPanel.setOpaque(false);
 
-        JLabel logoIcon =
-                new JLabel("✋");
-
-        logoIcon.setForeground(
-                blue
-        );
-
-        logoIcon.setFont(
-                new Font(
-                        "Arial",
-                        Font.PLAIN,
-                        25
-                )
-        );
-
         JLabel logoText =
-                new JLabel(
-                        "<html><b><font color='#222222'>Sikunye Charity</font></b></html>"
-                );
+                new JLabel("Sikunye Charity");
 
-        logoText.setFont(
-                new Font(
-                        "Arial",
-                        Font.PLAIN,
-                        12
-                )
-        );
-
-        logoPanel.add(
-                logoIcon,
-                BorderLayout.WEST
-        );
+        logoText.setForeground(new Color(35, 35, 35));
+        logoText.setFont(new Font("Arial", Font.BOLD, 14));
 
         logoPanel.add(
                 logoText,
@@ -225,7 +198,7 @@ public class DonationED extends JFrame {
                 new JPanel(
                         new FlowLayout(
                                 FlowLayout.RIGHT,
-                                18,
+                                16,
                                 5
                         )
                 );
@@ -233,21 +206,28 @@ public class DonationED extends JFrame {
         menu.setOpaque(false);
 
         JButton homeButton =
-                createNavButton("Home");
+                createNavButton("Home", false);
 
         JButton projectsButton =
-                createNavButton("Projects");
-        projectsButton.setForeground(blue);
+                createNavButton("Projects", false);
 
         JButton donateButton =
-                createNavButton("Donor");
+                createNavButton("Donor", true);
+
+        JButton itemsDonatedButton =
+                createNavButton("ItemsDonated", false);
+
+        JButton donationsReceivedButton =
+                createNavButton("DonationsRecieved", false);
 
         JButton contactButton =
-                createNavButton("Contact");
+                createNavButton("Contact", false);
 
         menu.add(homeButton);
         menu.add(projectsButton);
         menu.add(donateButton);
+        menu.add(itemsDonatedButton);
+        menu.add(donationsReceivedButton);
         menu.add(contactButton);
 
         navigation.add(
@@ -292,17 +272,35 @@ public class DonationED extends JFrame {
                 e -> showContactPage()
         );
 
+        itemsDonatedButton.addActionListener(
+                e -> openLinkedPage(
+                        "za.ac.cput.sikunyecharity.GUI.ItemsDonatedGUI",
+                        "za.ac.cput.sikunyecharity.GUI.ItemsDonatedPage",
+                        "za.ac.cput.sikunyecharity.GUI.ItemsDonated"
+                )
+        );
+
+        donationsReceivedButton.addActionListener(
+                e -> openLinkedPage(
+                        "za.ac.cput.sikunyecharity.GUI.DonationsRecievedGUI",
+                        "za.ac.cput.sikunyecharity.GUI.DonationsReceivedGUI",
+                        "za.ac.cput.sikunyecharity.GUI.DonationsRecievedPage",
+                        "za.ac.cput.sikunyecharity.GUI.DonationsReceivedPage"
+                )
+        );
+
         return container;
     }
 
     private JButton createNavButton(
-            String text
+            String text,
+            boolean active
     ) {
 
         JButton button =
                 new JButton(text);
 
-        button.setForeground(new Color(35, 35, 35));
+        button.setForeground(active ? new Color(111, 202, 222) : new Color(35, 35, 35));
 
         button.setBackground(Color.WHITE);
 
@@ -313,8 +311,8 @@ public class DonationED extends JFrame {
         button.setFont(
                 new Font(
                         "Arial",
-                        Font.BOLD,
-                        13
+                        Font.PLAIN,
+                        12
                 )
         );
 
@@ -1861,52 +1859,79 @@ donateButton.setFocusPainted(
     private JPanel createFooter() {
         JPanel footer = new JPanel();
         footer.setLayout(new BoxLayout(footer, BoxLayout.Y_AXIS));
-        footer.setBorder(new EmptyBorder(24, 30, 0, 30));
+        footer.setBorder(new EmptyBorder(12, 26, 0, 26));
         footer.setBackground(navy);
+
         JPanel columns = new JPanel(new GridLayout(1, 3, 24, 0));
         columns.setOpaque(false);
-        columns.setBorder(new EmptyBorder(0, 0, 20, 0));
+        columns.setBorder(new EmptyBorder(0, 0, 12, 0));
+
         JPanel brand = new JPanel();
         brand.setOpaque(false);
         brand.setLayout(new BoxLayout(brand, BoxLayout.Y_AXIS));
         JLabel name = new JLabel("Sikunye Charity");
         JLabel tagline = new JLabel("Together we are one");
-        JLabel privacy = new JLabel("Your information is safe and secure");
-        styleFooterLabel(name, true); styleFooterLabel(tagline, false); styleFooterLabel(privacy, false);
-        brand.add(name); brand.add(Box.createVerticalStrut(8)); brand.add(tagline);
-        brand.add(Box.createVerticalStrut(8)); brand.add(privacy);
+        styleFooterLabel(name, true);
+        styleFooterLabel(tagline, false);
+        brand.add(name);
+        brand.add(Box.createVerticalStrut(14));
+        brand.add(tagline);
+
         JPanel quickLinks = new JPanel();
         quickLinks.setOpaque(false);
         quickLinks.setLayout(new BoxLayout(quickLinks, BoxLayout.Y_AXIS));
         JLabel linksTitle = new JLabel("Quick Links");
         styleFooterLabel(linksTitle, true);
-        quickLinks.add(linksTitle); quickLinks.add(Box.createVerticalStrut(8));
-        for (String label : new String[]{"Home", "Projects", "Donor", "Contact"}) {
-            JLabel link = new JLabel(label); styleFooterLabel(link, false);
-            quickLinks.add(link); quickLinks.add(Box.createVerticalStrut(4));
+        quickLinks.add(linksTitle);
+        quickLinks.add(Box.createVerticalStrut(4));
+        for (String label : new String[]{
+                "Home", "ItemsDonated", "Projects", "Beneficiaries",
+                "Donor", "DonationsRecieved", "Contact", "Feedback"
+        }) {
+            JLabel link = new JLabel(label);
+            styleFooterLabel(link, false);
+            quickLinks.add(link);
+            quickLinks.add(Box.createVerticalStrut(2));
         }
+
         JPanel follow = new JPanel();
-        follow.setOpaque(false); follow.setLayout(new BoxLayout(follow, BoxLayout.Y_AXIS));
-        JLabel followTitle = new JLabel("Follow Us");
+        follow.setOpaque(false);
+        follow.setLayout(new BoxLayout(follow, BoxLayout.Y_AXIS));
+        JLabel followTitle = new JLabel("Follow us");
         JLabel icons = new JLabel("f   ◎   in");
-        styleFooterLabel(followTitle, true); styleFooterLabel(icons, false);
+        styleFooterLabel(followTitle, true);
+        styleFooterLabel(icons, false);
         icons.setFont(new Font("Arial", Font.BOLD, 18));
-        follow.add(followTitle); follow.add(Box.createVerticalStrut(8)); follow.add(icons);
-        columns.add(brand); columns.add(quickLinks); columns.add(follow);
+        follow.add(followTitle);
+        follow.add(Box.createVerticalStrut(10));
+        follow.add(icons);
+
+        columns.add(brand);
+        columns.add(quickLinks);
+        columns.add(follow);
+
         JPanel copyrightRow = new JPanel(new BorderLayout());
         copyrightRow.setOpaque(false);
         copyrightRow.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(115, 124, 132)),
-                new EmptyBorder(14, 0, 14, 0)));
-        JLabel copyright = new JLabel("© 2026 Sikunye Charity. All rights reserved.", SwingConstants.CENTER);
-        styleFooterLabel(copyright, false); copyrightRow.add(copyright, BorderLayout.CENTER);
-        footer.add(columns); footer.add(copyrightRow);
+                new EmptyBorder(8, 0, 8, 0)));
+        JLabel copyright = new JLabel(
+                "© 2020 SikunyeCharity.All rights reserved",
+                SwingConstants.CENTER
+        );
+        styleFooterLabel(copyright, false);
+        copyrightRow.add(copyright, BorderLayout.CENTER);
+
+        footer.add(columns);
+        footer.add(copyrightRow);
         return footer;
     }
+
     private void styleFooterLabel(JLabel label, boolean heading) {
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", heading ? Font.BOLD : Font.PLAIN, heading ? 14 : 12));
     }
+
     private void showHomePage() {
         HomeGUI home = new HomeGUI();
         home.setGui();
@@ -2045,4 +2070,5 @@ donateButton.setFocusPainted(
         );
     }
 }
+
 

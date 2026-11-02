@@ -171,6 +171,16 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         charityNameLabel.setFont(font1);
 
         homeLabel = new JLabel("Home");
+        homeLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                homeLinkLabel.setForeground(color1);
+
+                HomeGUI home = new HomeGUI();
+                home.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                home.setVisible(true);
+            }
+        });
         homeLabel.setFont(font2);
         projectLabel = new JLabel("Projects");
         projectLabel.setFont(font2);
@@ -774,12 +784,13 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
     public void itemStateChanged(ItemEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-public static void main(String[] args) {
-ContactGUI contact = new ContactGUI();
+
+    public static void main(String[] args) {
+        ContactGUI contact = new ContactGUI();
         contact.setGUI();
         contact.setVisible(true);
         contact.setSize(1000, 2000);
         contact.pack();
 
-}
+    }
 }
