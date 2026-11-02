@@ -41,7 +41,7 @@ public class HomeGUI extends JFrame implements ActionListener {
 
     private JPanel charityInfoFooterPanel, quickLinksPanel, sociallmediaLinkPanel,
             socialIconPanel, rightReservedPanel, footerPanel, mainPanel, headerPanel,
-            headingPanel, subHeadingPanel, descriptionPanel, buttonPanel, homePanel,charityNamePanel;
+            headingPanel, subHeadingPanel, descriptionPanel, buttonPanel, homePanel, charityNamePanel;
 
     private JLabel charityNameLabel,
             homeLabel,
@@ -101,7 +101,7 @@ public class HomeGUI extends JFrame implements ActionListener {
     public HomeGUI() {
         homePanel = new JPanel();
         headerPanel = new JPanel();
-        charityNamePanel=new JPanel();
+        charityNamePanel = new JPanel();
         charityInfoFooterPanel = new JPanel();
         headingPanel = new JPanel();
         subHeadingPanel = new JPanel();
@@ -127,7 +127,7 @@ public class HomeGUI extends JFrame implements ActionListener {
         donationRecievedLabel = new JLabel("DonationRecieved");
         donationRecievedLabel.setFont(font2);
         contactLabel = new JLabel("Contact");
-         
+
         contactLabel.setFont(font2);
 
         heading = new JLabel("Welcome to Sikunye Charity");
@@ -162,7 +162,7 @@ public class HomeGUI extends JFrame implements ActionListener {
 
         button.setBorder(BorderFactory.createEmptyBorder());
         button.addActionListener(this);
-        
+
         charityNameFooterLabel = new JLabel("Sikunye Charity");
         charityNameFooterLabel.setForeground(color2);
         charityNameFooterLabel.setFont(font1);
@@ -177,7 +177,6 @@ public class HomeGUI extends JFrame implements ActionListener {
         homeLinkLabel.setForeground(color2);
         homeLinkLabel.setFont(font4);
 
-        
         itemsDonatedLinkLabel = new JLabel("ItemsDonated");
         itemsDonatedLinkLabel.setForeground(color2);
         itemsDonatedLinkLabel.setFont(font4);
@@ -225,8 +224,8 @@ public class HomeGUI extends JFrame implements ActionListener {
     }
 
     public void setGui() {
-    headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
-Dimension panelHeaderSize = new Dimension(1390, 60);
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
+        Dimension panelHeaderSize = new Dimension(1390, 60);
         headerPanel.setPreferredSize(panelHeaderSize);
         headerPanel.setMinimumSize(panelHeaderSize);
         headerPanel.setMaximumSize(panelHeaderSize);
@@ -234,31 +233,29 @@ Dimension panelHeaderSize = new Dimension(1390, 60);
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
         headerPanel.setBorder(new MatteBorder(0, 0, 2, 0, color1));
-      
-        mainPanel.setLayout(new FlowLayout(FlowLayout.LEADING,32,18));
+
+        mainPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 32, 18));
         mainPanel.setOpaque(false);
-         mainPanel.add(homeLabel);
+        mainPanel.add(homeLabel);
         mainPanel.add(projectLabel);
-         mainPanel.add(donorLabel);
-         mainPanel.add(itemsDonatedLabel);
+        mainPanel.add(donorLabel);
+        mainPanel.add(itemsDonatedLabel);
         mainPanel.add(donationRecievedLabel);
         mainPanel.add(contactLabel);
-       //charityNamePanel.setLayout(new FlowLayout(FlowLayout.LEFT,15,18));
+        //charityNamePanel.setLayout(new FlowLayout(FlowLayout.LEFT,15,18));
 //       charityNamePanel.add(charityNameLabel);
 //charityNamePanel.setOpaque(false);
 //       
 //       headerPanel.add(charityNamePanel);
- headerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
-headerPanel.add(charityNameLabel);
- headerPanel.add(Box.createRigidArea(new Dimension(365, 0)));
-       headerPanel.add(mainPanel);
-       
-       
-       
-       homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
+        headerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
+        headerPanel.add(charityNameLabel);
+        headerPanel.add(Box.createRigidArea(new Dimension(365, 0)));
+        headerPanel.add(mainPanel);
+
+        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
         homePanel.setBackground(color4);
         homePanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-         
+
         homePanel.add(headerPanel);
         homePanel.add(Box.createRigidArea(new Dimension(0, 65)));
 

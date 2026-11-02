@@ -94,6 +94,9 @@ public class ContactTable extends JFrame implements ActionListener, ItemListener
     }
 
     public ContactTable(ContactGUI contact) {
+        super("Contact Table");
+         
+        
         this.contact=contact;
        
         
@@ -266,7 +269,7 @@ public void loadData(){
                     }
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(ContactSTable.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ContactTable.class.getName()).log(Level.SEVERE, null, ex);
             }
 
 }
@@ -347,5 +350,18 @@ public void loadData(){
 
         }
     }
+
+public static void main(String[] args) {
+    ContactGUI contact =new ContactGUI();
+ContactTable  contactTable = new ContactTable(contact);
+       contactTable .setGui();
+       contactTable .setVisible(true);
+       contactTable .setSize(1000, 2000);
+        contactTable .pack();
+
+}
+
+
+
 
 }

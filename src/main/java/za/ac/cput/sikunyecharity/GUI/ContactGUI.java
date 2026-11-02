@@ -48,7 +48,8 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
 
     private JPanel mainPanel, headerPanel, centerPanel, charityInfoPanel, emailPanel, phonePanel,
             locationPanel, hoursPanel, queryPanel, sendButtonPanel, westPanel, footerPanel,
-            backButtonPanel, charityInfoFooterPanel, quickLinksPanel, sociallmediaLinkPanel, rightReservedPanel, socialIconPanel;
+            backButtonPanel, charityInfoFooterPanel, quickLinksPanel, sociallmediaLinkPanel,
+            rightReservedPanel, socialIconPanel, navBarPanel;
     private JTable table;
     private DefaultTableModel tableModel;
 
@@ -72,8 +73,6 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
     private JLabel charityHoursLabel;
     private JLabel charityHoursInfoLabel;
 
-//    private ImageIcon icon;
-//    private JLabel email;
     private JLabel formHeadingLabel;
     private JLabel userFullNameLabel;
     private JTextField userFullNameTextField;
@@ -148,6 +147,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
 
         mainPanel = new JPanel();
         headerPanel = new JPanel();
+        navBarPanel = new JPanel();
         centerPanel = new JPanel();
         charityInfoPanel = new JPanel();
         emailPanel = new JPanel();
@@ -179,7 +179,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         donationRecievedLabel = new JLabel("DonationRecieved");
         donationRecievedLabel.setFont(font2);
         contactLabel = new JLabel("Contact");
-        
+
         contactLabel.setFont(font2);
 
         mainHeadingLabel = new JLabel("" + "Get Involved  with our Organisation");
@@ -405,7 +405,17 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         mainPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         mainPanel.setPreferredSize(new Dimension(1390, 1552));
 
-        headerPanel.setLayout(new FlowLayout(FlowLayout.RIGHT,50,18));
+        navBarPanel.setLayout(new BoxLayout(navBarPanel, BoxLayout.X_AXIS));
+        Dimension navBarSize = new Dimension(1390, 60);
+        navBarPanel.setPreferredSize(navBarSize);
+        navBarPanel.setMinimumSize(navBarSize);
+        navBarPanel.setMaximumSize(navBarSize);
+        navBarPanel.setOpaque(true);
+        navBarPanel.setBackground(Color.WHITE);
+        navBarPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
+        navBarPanel.setBorder(new MatteBorder(0, 0, 2, 0, color1));
+
+        headerPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 32, 18));
         Dimension panelHeaderSize = new Dimension(1390, 60);
 
         headerPanel.setPreferredSize(panelHeaderSize);
@@ -414,14 +424,17 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         headerPanel.setOpaque(true);
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-        headerPanel.add(charityNameLabel);
+
         headerPanel.add(homeLabel);
         headerPanel.add(projectLabel);
         headerPanel.add(donorLabel);
         headerPanel.add(itemsDonatedLabel);
         headerPanel.add(donationRecievedLabel);
         headerPanel.add(contactLabel);
-
+        navBarPanel.add(Box.createRigidArea(new Dimension(50, 0)));
+        navBarPanel.add(charityNameLabel);
+        navBarPanel.add(Box.createRigidArea(new Dimension(365, 0)));
+        navBarPanel.add(headerPanel);
         centerPanel.setLayout(new GridLayout(2, 1, 0, 0));
         Dimension panelCenterSize = new Dimension(1390, 100);
 
@@ -631,7 +644,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         footerPanel.add(sociallmediaLinkPanel);
 
         // panelMain.setLayout(new BorderLayout());
-        mainPanel.add(headerPanel);
+        mainPanel.add(navBarPanel);
         mainPanel.add(centerPanel);
         mainPanel.add(charityInfoPanel);
 
@@ -689,15 +702,15 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         this.currentSelectedContact = id;
         userFullNameTextField.setText(fullName);
         userFullNameTextField.setForeground(Color.BLACK);
-       
+
         userEmailTextField.setText(email);
         userEmailTextField.setForeground(Color.BLACK);
-        
+
         userMobileTextField.setText(phoneNumber);
-        
+
         subjectCombo.setSelectedItem(subject);
         subjectCombo.setForeground(Color.BLACK);
-        
+
         messageTextArea.setText(message);
         messageTextArea.setForeground(Color.BLACK);
 
@@ -719,30 +732,27 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
 
             if (!fullName.isEmpty() && !email.isEmpty() && !mobile.isEmpty() && !subject.equals("Select your query type") && !message.isEmpty()) {
 
-                
                 ContactDAO contactdao = new ContactDAO();
                 try {
-                     if(currentSelectedContact.isEmpty()){
-                         Contact contact = new Contact(0, fullName, email, mobile, subject, message);
-                     
-                    contactdao.sendMessage(contact);
-                      JOptionPane.showMessageDialog(null, "Thank you " + fullName + " your QUERY has been recieved we will get back to you soon!!");
-                refresh();
-                     }
-                     else{
-                    
-                    int existingId=Integer.parseInt(currentSelectedContact);
-                    Contact contact = new Contact(existingId, fullName, email, mobile, subject, message);
-                    
-                    contactdao.updateById(contact);
-                    JOptionPane.showMessageDialog(null, "Query updated successfully.");
-                refresh();
+                    if (currentSelectedContact.isEmpty()) {
+                        Contact contact = new Contact(0, fullName, email, mobile, subject, message);
+
+                        contactdao.sendMessage(contact);
+                        JOptionPane.showMessageDialog(null, "Thank you " + fullName + " your QUERY has been recieved we will get back to you soon!!");
+                        refresh();
+                    } else {
+
+                        int existingId = Integer.parseInt(currentSelectedContact);
+                        Contact contact = new Contact(existingId, fullName, email, mobile, subject, message);
+
+                        contactdao.updateById(contact);
+                        JOptionPane.showMessageDialog(null, "Query updated successfully.");
+                        refresh();
                     }
                 } catch (SQLException ex) {
-                    Logger.getLogger(ContactSTable.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(ContactGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-               
             } else {
                 JOptionPane.showMessageDialog(null, "Message not sent please enter all required fields");
             }
@@ -753,5 +763,12 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
     public void itemStateChanged(ItemEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+public static void main(String[] args) {
+ContactGUI contact = new ContactGUI();
+        contact.setGUI();
+        contact.setVisible(true);
+        contact.setSize(1000, 2000);
+        contact.pack();
 
+}
 }

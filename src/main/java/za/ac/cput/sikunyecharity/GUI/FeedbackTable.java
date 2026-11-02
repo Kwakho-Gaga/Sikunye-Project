@@ -55,21 +55,18 @@ import za.ac.cput.sikunyecharity.Domain.Feedback;
  */
 public class FeedbackTable extends JFrame implements ActionListener, ItemListener {
 
-    private JSplitPane splitPane;
-    private JPanel mainPanel, ratePanel, buttonPanel, adminPanel, loginPanel, loginButtonPanel, charityDescrPanel;
-    private boolean loggedIn = false;
+   
+    private JPanel mainPanel, ratePanel, buttonPanel, adminPanel, charityDescrPanel;
+    
     private JLabel headerLabel;
     private JLabel charityDescription;
-    private JLabel usernameLabel;
-    private JTextField usernameTextField;
-    private JLabel passwordLabel;
-    private JTextField passwordTextField;
+    
     private JTextField nameTextField;
     private JTextField emailTextField;
     private JTextField subjectTextField;
     private JTextArea commentTextArea;
     private JLabel rateLabel;
-    private JButton loginButton;
+    
     private JButton refreshButton;
     private JButton updateButton;
     private JButton deleteButton;
@@ -111,15 +108,12 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
 
     public FeedbackTable(FeedbackGUI feedbackForm) {
         this.feedbackForm=feedbackForm;
-        splitPane = new JSplitPane();
+        
         charityDescrPanel = new JPanel();
-        usernameLabel = new JLabel("Username: ");
-        usernameTextField = new JTextField();
-        passwordLabel = new JLabel("Password: ");
-        passwordTextField = new JTextField();
-        loginPanel = new JPanel();
+        
+        
         adminPanel = new JPanel();
-        loginButtonPanel = new JPanel();
+        
         mainPanel = new JPanel();
         ratePanel = new JPanel();
         buttonPanel = new JPanel();
@@ -145,12 +139,7 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
             star[i] = createStar();
         }
 
-        loginButton = new JButton("Login");
-        loginButton.setFont(font6);
-        loginButton.setBackground(color1);
-        loginButton.setBorder(new EmptyBorder(6, 30, 10, 35));
-        loginButton.setForeground(color2);
-        loginButton.setOpaque(true);
+       
 
         refreshButton = new JButton("REFRESH");
         refreshButton.setFont(font6);
@@ -170,7 +159,7 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
         updateButton.setBorder(new EmptyBorder(5, 30, 5, 35));
         updateButton.setForeground(color2);
         updateButton.setOpaque(true);
-        loginButton.addActionListener(this);
+        
         refreshButton.addActionListener(this);
         deleteButton.addActionListener(this);
         updateButton.addActionListener(this);
@@ -206,74 +195,20 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
 
     public void setGui() {
         this.setTitle("Feedback Table");
-        
-
-        mainPanel.setOpaque(false);
-        mainPanel.setBackground(color3);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-//        mainPanel.setBorder(new EmptyBorder(50, 150, 50, 150));
-//        Dimension mainPanelSize = new Dimension(1000, 1000);
-//
-//        mainPanel.setPreferredSize(mainPanelSize);
-//        mainPanel.setMinimumSize(mainPanelSize);
-//        mainPanel.setMaximumSize(mainPanelSize);
-
-        charityDescrPanel.setLayout(new BoxLayout(charityDescrPanel, BoxLayout.Y_AXIS));
-        charityDescrPanel.add(Box.createRigidArea(new Dimension(10, 10)));
-        charityDescrPanel.add(headerLabel);
-        charityDescrPanel.add(Box.createRigidArea(new Dimension(10, 10)));
-        charityDescrPanel.add(charityDescription);
-
-        loginPanel.add(Box.createRigidArea(new Dimension(20, 20)));
-
-        loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.Y_AXIS));
-        Dimension loginPanelSize = new Dimension(500, 200);
-
-        loginPanel.setPreferredSize(loginPanelSize);
-        loginPanel.setMinimumSize(loginPanelSize);
-        loginPanel.setMaximumSize(loginPanelSize);
-
-        Dimension userSize = new Dimension(300, 35);
-
-        usernameTextField.setPreferredSize(userSize);
-        usernameTextField.setMinimumSize(userSize);
-        usernameTextField.setMaximumSize(userSize);
-        loginPanel.add(createLeftAlignedPanel(usernameLabel, usernameTextField));
-
-        loginPanel.add(Box.createRigidArea(new Dimension(20, 20)));
-        Dimension passwordSize = new Dimension(300, 35);
-
-        passwordTextField.setPreferredSize(passwordSize);
-        passwordTextField.setMinimumSize(passwordSize);
-        passwordTextField.setMaximumSize(passwordSize);
-        loginPanel.add(createLeftAlignedPanel(passwordLabel, passwordTextField));
-
-        loginPanel.add(Box.createRigidArea(new Dimension(20, 20)));
-
-        loginButtonPanel.setLayout(new FlowLayout());
-        loginButtonPanel.add(loginButton);
-        loginPanel.add(loginButtonPanel);
-        adminPanel.setLayout(new BoxLayout(adminPanel, BoxLayout.Y_AXIS));
+         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
         buttonPanel.setLayout(new FlowLayout());
         buttonPanel.add(refreshButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(updateButton);
-
-        adminPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
-        adminPanel.add(buttonPanel);
-        adminPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-
+        buttonPanel.add(deleteButton);
         JScrollPane scroll = new JScrollPane(table);
-        adminPanel.add(scroll);
-       adminPanel.setVisible(false);
 
-        
-      mainPanel.add(loginPanel);
-        mainPanel.add(adminPanel);
+        mainPanel.add(buttonPanel);
+        mainPanel.add(scroll);
 
         this.add(mainPanel);
+
+        
     }
 
     private void setPlaceholder(JTextComponent field, String placeholder) {
@@ -440,28 +375,8 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == loginButton) {
-            String username = usernameTextField.getText();
-            String password = passwordTextField.getText();
-
-            if (username.equals("Staff") && password.equals("password")) {
-                loggedIn = true;
-                loginPanel.setVisible(false);
-                adminPanel.setVisible(true);
-                mainPanel.revalidate();
-                mainPanel.repaint();
-
-                JOptionPane.showMessageDialog(this, "Login successful!");
-            } else {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Incorrect username or password.",
-                        "Login failed",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
-
-        } else if (e.getSource() == refreshButton) {
+       
+        if (e.getSource() == refreshButton) {
          refreshTable()  ; 
         }
         else if (e.getSource() == deleteButton) {
