@@ -34,6 +34,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
@@ -167,25 +168,33 @@ public class ContactTable extends JFrame implements ActionListener, ItemListener
         tableModel.addColumn("Subject");
         tableModel.addColumn("Message");
 
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                int i = table.getSelectedRow();
-                if (i != -1 && contact !=null) {
-                    String id=table.getValueAt(i, 0).toString();
-                    String fullName=table.getValueAt(i, 1).toString();
-                    String email=table.getValueAt(i, 2).toString();
-                    String pnoneNumber=table.getValueAt(i, 3).toString();
-                    String subject=table.getValueAt(i, 4).toString();
-                   String message=table.getValueAt(i, 5).toString();
-                    subjectCombo.setSelectedItem(subject);
-                    contact.populateContactFormFields(id, fullName, email, pnoneNumber, subject, message);
+       table.addMouseListener(new MouseAdapter() {
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+        int i = table.getSelectedRow();
 
+        if (i != -1) {
+            String id = table.getValueAt(i, 0).toString();
+            String fullName = table.getValueAt(i, 1).toString();
+            String email = table.getValueAt(i, 2).toString();
+            String phoneNumber = table.getValueAt(i, 3).toString();
+            String subject = table.getValueAt(i, 4).toString();
+            String message = table.getValueAt(i, 5).toString();
 
-                }
+            userFullNameTextField.setText(fullName);
+            userEmailTextField.setText(email);
+            userMobileTextField.setText(phoneNumber);
+            subjectCombo.setSelectedItem(subject);
+            messageTextArea.setText(message);
 
+            if (contact != null) {
+                contact.populateContactFormFields(
+                        id, fullName, email, phoneNumber, subject, message
+                );
             }
-        });
+        }
+    }
+});
 loadData();
     }
 
@@ -352,13 +361,19 @@ public void loadData(){
     }
 
 public static void main(String[] args) {
-    ContactGUI contact =new ContactGUI();
-ContactTable  contactTable = new ContactTable(contact);
-       contactTable .setGui();
-       contactTable .setVisible(true);
-       contactTable .setSize(1000, 2000);
-        contactTable .pack();
+    SwingUtilities.invokeLater(() -> {
+        ContactGUI contact = new ContactGUI();
+        contact.setGUI();
+        contact.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        contact.setSize(1000, 900);
+        contact.setVisible(true);
 
+        ContactTable contactTable = new ContactTable(contact);
+        contactTable.setGui();
+        contactTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        contactTable.setSize(1000, 700);
+        contactTable.setVisible(true);
+    });
 }
 
 

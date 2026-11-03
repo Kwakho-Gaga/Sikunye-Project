@@ -113,6 +113,8 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
     Font font5 = new Font("Inter", Font.BOLD, 16);
     Font font6 = new Font("Inter", Font.BOLD, 14);
     Font font7 = new Font("Inter", Font.PLAIN, 17);
+    Font font8=new Font("Sanserif",Font.BOLD,17);
+    Font font9=new Font("Sanserif",Font.PLAIN,16);
 
     Color color1 = new Color(0, 192, 232);
     Color color2 = Color.WHITE;
@@ -168,7 +170,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         footerPanel = new JPanel();
 
         charityNameLabel = new JLabel("SikunyeCharity");
-        charityNameLabel.setFont(font1);
+        charityNameLabel.setFont(font8);
 
         homeLabel = new JLabel("Home");
         
@@ -187,12 +189,12 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
                 home.setVisible(true);
             }
         });
-        homeLabel.setFont(font2);
+        homeLabel.setFont(font9);
         projectLabel = new JLabel("Projects");
-        projectLabel.setFont(font2);
+        projectLabel.setFont(font9);
         AppNavigation.link(projectLabel, this, "Projects");
         beneficiariesLabel = new JLabel("Beneficiaries");
-        beneficiariesLabel.setFont(font2);
+        beneficiariesLabel.setFont(font9);
         AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
         donorLabel = new JLabel("Donor");
          donorLabel  .addMouseListener(new MouseAdapter() {
@@ -210,7 +212,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
                 donation.setVisible(true);
             }
         });
-        donorLabel.setFont(font2);
+        donorLabel.setFont(font9);
         
         
         itemsDonatedLabel = new JLabel("ItemsDonated");
@@ -228,7 +230,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
 //               item.setVisible(true);
 //            }
 //        });
-        itemsDonatedLabel.setFont(font2);
+        itemsDonatedLabel.setFont(font9);
         
         
         
@@ -253,10 +255,10 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         
         
         
-        donationRecievedLabel.setFont(font2);
+        donationRecievedLabel.setFont(font9);
         contactLabel = new JLabel("Contact");
 
-        contactLabel.setFont(font2);
+        contactLabel.setFont(font9);
 
         mainHeadingLabel = new JLabel("" + "Get Involved  with our Organisation");
         mainHeadingLabel.setFont(font2);

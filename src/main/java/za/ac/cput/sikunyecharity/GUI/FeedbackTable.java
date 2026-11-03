@@ -42,6 +42,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
@@ -173,23 +174,40 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
         tableModel.addColumn("Comment");
         tableModel.addColumn("Rating");
         table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                int i = table.getSelectedRow();
-                if (i != -1 && feedbackForm !=null) {
-                    String id=table.getValueAt(i, 0).toString();
-                    String name=table.getValueAt(i, 1).toString();
-                    String email=table.getValueAt(i, 2).toString();
-                    String subject=table.getValueAt(i, 3).toString();
-                    String comment=table.getValueAt(i, 4).toString();
-                    int rating = Integer.parseInt(tableModel.getValueAt(i, 5).toString());
-                    setStar(rating);
-                    feedbackForm.populateFromFields(id, name, email, subject, comment, rating);
+    @Override
+    public void mouseClicked(MouseEvent arg0) {
+        int i = table.getSelectedRow();
 
-                }
+        if (i != -1) {
+            String id = table.getValueAt(i, 0).toString();
+            String name = table.getValueAt(i, 1).toString();
+            String email = table.getValueAt(i, 2).toString();
+            String subject = table.getValueAt(i, 3).toString();
+            String comment = table.getValueAt(i, 4).toString();
+            int rating = Integer.parseInt(
+                    table.getValueAt(i, 5).toString()
+            );
 
+            // Fill the fields in FeedbackTable
+            nameTextField.setText(name);
+            nameTextField.setForeground(Color.BLACK);
+            emailTextField.setText(email);
+            emailTextField.setForeground(Color.BLACK);
+            subjectTextField.setText(subject);
+            subjectTextField.setForeground(Color.BLACK);
+            commentTextArea.setText(comment);
+            commentTextArea.setForeground(Color.BLACK);
+            setStar(rating);
+
+            // Fill the form in FeedbackGUI and change SUBMIT to Update
+            if (feedbackForm != null) {
+                feedbackForm.populateFromFields(
+                        id, name, email, subject, comment, rating
+                );
             }
-        });  
+        }
+    }
+}); 
        loadData();
     }
 
@@ -460,4 +478,23 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
         }
 
     }
+    
+   public static void main(String[] args) {
+    SwingUtilities.invokeLater(() -> {
+        FeedbackGUI feedback = new FeedbackGUI();
+        feedback.setGui();
+        feedback.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        feedback.pack();
+        feedback.setLocationRelativeTo(null);
+        feedback.setVisible(true);
+
+        FeedbackTable feedbackTable = new FeedbackTable(feedback);
+        feedbackTable.setGui();
+        feedbackTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        feedbackTable.setSize(900, 700);
+        feedbackTable.setLocationRelativeTo(feedback);
+        feedbackTable.setVisible(true);
+    });
+} 
+    
 }
