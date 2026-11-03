@@ -171,13 +171,19 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         charityNameLabel.setFont(font1);
 
         homeLabel = new JLabel("Home");
-        homeLabel.addMouseListener(new MouseAdapter() {
+        
+ homeLabel .addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                homeLinkLabel.setForeground(color1);
+                 homeLabel .setForeground(color1);
 
                 HomeGUI home = new HomeGUI();
+                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+                home.setGui();
+
+                home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 home.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //feedback.setLocationRelativeTo(ContactGUI.this);
                 home.setVisible(true);
             }
         });
@@ -189,10 +195,64 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         beneficiariesLabel.setFont(font2);
         AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
         donorLabel = new JLabel("Donor");
+         donorLabel  .addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                 donorLabel  .setForeground(color1);
+
+                DonationED donation = new DonationED();
+                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+               
+
+                donation.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                donation.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //feedback.setLocationRelativeTo(ContactGUI.this);
+                donation.setVisible(true);
+            }
+        });
         donorLabel.setFont(font2);
+        
+        
         itemsDonatedLabel = new JLabel("ItemsDonated");
+//        itemsDonatedLabel  .addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//            
+//                ItemDonated item=new ItemDonated();
+//                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+//               
+//
+//               item .setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//               item.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//                //feedback.setLocationRelativeTo(ContactGUI.this);
+//               item.setVisible(true);
+//            }
+//        });
         itemsDonatedLabel.setFont(font2);
+        
+        
+        
+        
         donationRecievedLabel = new JLabel("DonationRecieved");
+        
+        donationRecievedLabel  .addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                 
+
+                DashboardGUI dashboard = new DashboardGUI();
+                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+               
+
+               //dashboard .setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+              // dashboard .setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //feedback.setLocationRelativeTo(ContactGUI.this);
+               dashboard .setVisible(true);
+            }
+        });
+        
+        
+        
         donationRecievedLabel.setFont(font2);
         contactLabel = new JLabel("Contact");
 

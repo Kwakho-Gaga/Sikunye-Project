@@ -127,12 +127,46 @@ public class HomeGUI extends JFrame implements ActionListener {
         beneficiariesLabel.setFont(font2);
         AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
         donorLabel = new JLabel("Donor");
+        donorLabel  .addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                 donorLabel  .setForeground(color1);
+
+                DonationED donation = new DonationED();
+                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+               
+
+                donation.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                donation.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //feedback.setLocationRelativeTo(ContactGUI.this);
+                donation.setVisible(true);
+            }
+        });
         donorLabel.setFont(font2);
         itemsDonatedLabel = new JLabel("ItemsDonated");
         itemsDonatedLabel.setFont(font2);
-        donationRecievedLabel = new JLabel("DonationRecieved");
-        donationRecievedLabel.setFont(font2);
+        
+         donationRecievedLabel = new JLabel("DonationReceived");
+         donationRecievedLabel.setFont(font2);
+        AppNavigation.link( donationRecievedLabel, this, "DonationReceived");
+
         contactLabel = new JLabel("Contact");
+ contactLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                 contactLabel.setForeground(color1);
+
+                ContactGUI contact = new ContactGUI();
+                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+                contact.setGUI();
+
+                contact.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                contact.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //feedback.setLocationRelativeTo(ContactGUI.this);
+                contact.setVisible(true);
+            }
+        });
+        contactLabel.setFont(font2);
 
         contactLabel.setFont(font2);
 
