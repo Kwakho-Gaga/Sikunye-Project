@@ -15,6 +15,8 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -44,7 +46,7 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Gaga Kwakho
  */
-public class DonationED extends JFrame {
+ public class DonationED extends JFrame {
 
     private static final String DB_URL =
             "jdbc:derby://localhost:1527/SikunyeDB";
@@ -211,6 +213,9 @@ public class DonationED extends JFrame {
         JButton projectsButton =
                 createNavButton("Projects", false);
 
+        JButton beneficiariesButton =
+                createNavButton("Beneficiaries", false);
+
         JButton donateButton =
                 createNavButton("Donor", true);
 
@@ -225,6 +230,7 @@ public class DonationED extends JFrame {
 
         menu.add(homeButton);
         menu.add(projectsButton);
+        menu.add(beneficiariesButton);
         menu.add(donateButton);
         menu.add(itemsDonatedButton);
         menu.add(donationsReceivedButton);
@@ -262,6 +268,10 @@ public class DonationED extends JFrame {
 
         projectsButton.addActionListener(
                 e -> showProjectsPage()
+        );
+
+        beneficiariesButton.addActionListener(
+                e -> openFooterPage("Beneficiaries")
         );
 
         donateButton.addActionListener(
@@ -1890,6 +1900,13 @@ donateButton.setFocusPainted(
         }) {
             JLabel link = new JLabel(label);
             styleFooterLabel(link, false);
+            link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            link.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent event) {
+                    openFooterPage(label);
+                }
+            });
             quickLinks.add(link);
             quickLinks.add(Box.createVerticalStrut(2));
         }
@@ -1930,6 +1947,50 @@ donateButton.setFocusPainted(
     private void styleFooterLabel(JLabel label, boolean heading) {
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Arial", heading ? Font.BOLD : Font.PLAIN, heading ? 14 : 12));
+    }
+
+    private void openFooterPage(String destination) {
+        switch (destination) {
+            case "Home":
+                showHomePage();
+                break;
+            case "Projects":
+                showProjectsPage();
+                break;
+            case "Beneficiaries":
+                openLinkedPage(
+                        "za.ac.cput.sikunyecharity.GUI.BeneficiariesMenu"
+                );
+                break;
+            case "Donor":
+                showDonatePage();
+                break;
+            case "Contact":
+                showContactPage();
+                break;
+            case "Feedback":
+                openLinkedPage(
+                        "za.ac.cput.sikunyecharity.GUI.FeedbackGUI"
+                );
+                break;
+            case "ItemsDonated":
+                openLinkedPage(
+                        "za.ac.cput.sikunyecharity.GUI.ItemsDonatedGUI",
+                        "za.ac.cput.sikunyecharity.GUI.ItemsDonatedPage",
+                        "za.ac.cput.sikunyecharity.GUI.ItemsDonated"
+                );
+                break;
+            case "DonationsRecieved":
+                openLinkedPage(
+                        "za.ac.cput.sikunyecharity.GUI.DonationsRecievedGUI",
+                        "za.ac.cput.sikunyecharity.GUI.DonationsReceivedGUI",
+                        "za.ac.cput.sikunyecharity.GUI.DonationsRecievedPage",
+                        "za.ac.cput.sikunyecharity.GUI.DonationsReceivedPage"
+                );
+                break;
+            default:
+                break;
+        }
     }
 
     private void showHomePage() {
@@ -2070,5 +2131,3 @@ donateButton.setFocusPainted(
         );
     }
 }
-
-

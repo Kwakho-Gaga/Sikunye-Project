@@ -1,12 +1,6 @@
-package za.ac.cput.mavenproject6.gui;
+package za.ac.cput.sikunyecharity.gui;
 
-import za.ac.cput.mavenproject6.dao.BeneficiaryDAO;
-import za.ac.cput.mavenproject6.dao.BeneficiaryNeedsDAO;
-import za.ac.cput.mavenproject6.dao.ItemDonatedDAO;
-import za.ac.cput.mavenproject6.domain.Beneficiary;
-import za.ac.cput.mavenproject6.domain.BeneficiaryNeed;
-import za.ac.cput.mavenproject6.domain.ItemDistributed;
-import za.ac.cput.mavenproject6.domain.ItemDonatedModel;
+
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,6 +15,13 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import za.ac.cput.mavenproject6.domain.ItemDistributed;
+import za.ac.cput.mavenproject6.domain.ItemDonatedModel;
+import za.ac.cput.sikunyecharity.DAO.BeneficiaryDAO;
+import za.ac.cput.sikunyecharity.DAO.BeneficiaryNeedsDAO;
+import za.ac.cput.sikunyecharity.Domain.Beneficiary;
+import za.ac.cput.sikunyecharity.Domain.BeneficiaryNeed;
+import za.ac.cput.sikunyecharity.dao.ItemDonatedDAO;
 
 public class ItemDonated extends JPanel {
 

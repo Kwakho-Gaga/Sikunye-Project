@@ -22,10 +22,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import za.ac.cput.sikunyecharity.DAO.DonationDAO;
+//import za.ac.cput.sikunyecharity.DAO.DonationDAO;
 import za.ac.cput.sikunyecharity.DAO.ProjectDAO;
 import za.ac.cput.sikunyecharity.DAO.ProjectRegistrationDAO;
-import za.ac.cput.sikunyecharity.Domain.Donation;
+//import za.ac.cput.sikunyecharity.Domain.Donation;
 import za.ac.cput.sikunyecharity.Domain.Project;
 import za.ac.cput.sikunyecharity.Domain.ProjectRegistration;
 
@@ -54,7 +54,7 @@ public class ProjecTable extends JFrame implements ActionListener {
 
     private final ProjectDAO projectDAO = new ProjectDAO();
     private final ProjectRegistrationDAO registrationDAO = new ProjectRegistrationDAO();
-    private final DonationDAO donationDAO = new DonationDAO();
+    //private final DonationDAO donationDAO = new DonationDAO();
 
     private JButton btnRegister;
     private JButton btnDonate;
@@ -520,9 +520,9 @@ public class ProjecTable extends JFrame implements ActionListener {
             BigDecimal amount) {
 
         try {
-            donationDAO.saveDonation(
-                    new Donation(projectID, userName, userEmail, amount)
-            );
+           // donationDAO.saveDonation(
+                //    new Donation(projectID, userName, userEmail, amount)
+            //);
 
             JOptionPane.showMessageDialog(
                     this,

@@ -1,12 +1,13 @@
-package za.ac.cput.mavenproject6.dao;
+package za.ac.cput.sikunyecharity.dao;
 
-import za.ac.cput.mavenproject6.connection.DBConnection;
+
 import za.ac.cput.mavenproject6.domain.ItemDistributed;
 import za.ac.cput.mavenproject6.domain.ItemDonatedModel;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import za.ac.cput.sikunyecharity.DBConection.DBConnection;
 
 public class ItemDonatedDAO {
 
