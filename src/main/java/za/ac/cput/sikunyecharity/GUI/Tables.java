@@ -46,9 +46,9 @@ public class Tables extends JFrame implements ActionListener {
 
     private final Font font6 = new Font("Inter", Font.BOLD, 14);
     private final Color color1 = new Color(0, 192, 232);
-FeedbackGUI feedbackForm;
+;
 ContactGUI contactForm;
-    public Tables(ContactGUI contactForm, FeedbackGUI feedbackForm) {
+    public Tables() {
         super("Admin Login");
 
         buildLoginPanel();
@@ -144,7 +144,7 @@ ContactGUI contactForm;
         feedback.setLocationRelativeTo(null);
         feedback.setVisible(true);
 
-        Tables table = new Tables(contact,feedback);
+        Tables table = new Tables();
 
         table.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         table.setSize(1000, 900);

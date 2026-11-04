@@ -406,7 +406,24 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         tableModel.addColumn("User_Mobile");
         tableModel.addColumn("Status");
 
-        backButton = new JButton("Back");
+        backButton = new JButton("Back home");
+         backButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                backButton.setForeground(color1);
+
+                HomeGUI home = new HomeGUI();
+                // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
+                home.setGui();
+
+                home.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                home.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //feedback.setLocationRelativeTo(ContactGUI.this);
+                home.setVisible(true);
+            }
+        });
+        
+        
         backButton.setBackground(color1);
         backButton.setForeground(color2);
 
@@ -476,20 +493,9 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
             public void mouseClicked(MouseEvent e) {
                 adminLabel.setForeground(color2);
 
-                ContactGUI contact = new ContactGUI();
-                contact.setGUI();
-                contact.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                contact.setSize(1000, 900);
-                contact.setVisible(true);
+               
 
-                FeedbackGUI feedback = new FeedbackGUI();
-                feedback.setGui();
-                feedback.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                feedback.pack();
-                feedback.setLocationRelativeTo(null);
-                feedback.setVisible(true);
-
-                Tables table = new Tables(contact, feedback);
+                Tables table = new Tables();
 
                 table.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 table.setSize(1000, 900);
