@@ -4,41 +4,44 @@
  */
 package za.ac.cput.sikunyecharity.GUI;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import za.ac.cput.sikunyecharity.DAO.DonationDAO;
+import za.ac.cput.sikunyecharity.DAO.DonationItemDAO;
+import za.ac.cput.sikunyecharity.Domain.Donation;
+import za.ac.cput.sikunyecharity.Domain.DonationItem;
+import java.sql.SQLException;
+import java.util.List;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.net.URL;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 
 /**
  *
  * @author User
  */
 public class DashboardGUI extends JPanel {
+    
+    private JPanel headerPanel, navLinksPanel;
+
+private JLabel charityNameLabel,
+        homeLabel,
+        projectLabel,
+        beneficiariesLabel,
+        donorLabel,
+        itemsDonatedLabel,
+        donationRecievedLabel,
+        contactLabel;
+
+
+
+
+
 
     private static final String ADMIN_USERNAME = "admin";
     private static final String ADMIN_PASSWORD = "1234";
@@ -64,137 +67,143 @@ public class DashboardGUI extends JPanel {
     private JTextField searchField;
     private JComboBox<String> donationTypeCombo;
     private JComboBox<String> paymentStatusCombo;
+    
+   
+Font font1 = new Font("Inter", Font.BOLD, 20);
+Font font2 = new Font("Inter", Font.PLAIN, 20);
+Font font4 = new Font("Inter", Font.BOLD, 15);
+Font font5 = new Font("Inter", Font.BOLD, 16);
+Font font6 = new Font("Inter", Font.BOLD, 14);
 
-    public DashboardGUI() {
+Color color1 = new Color(0, 192, 232);
+Color color2 = Color.WHITE;
+
+Color color5 = new Color(43, 55, 63, 230);
+Color color6 = new Color(142, 142, 147);
+Color color7 = new Color(179, 179, 179);
+    
+    private JPanel footerPanel, charityInfoFooterPanel, quickLinksPanel,
+        sociallmediaLinkPanel, rightReservedPanel, socialIconPanel;
+
+private JLabel charityNameFooterLabel;
+private JLabel charitySloganLabel;
+private JLabel quickLinkLabel;
+private JLabel homeLinkLabel;
+private JLabel itemsDonatedLinkLabel;
+private JLabel projectLinkLabel;
+private JLabel beneficiariesLinkLabel;
+private JLabel donorLinkLabel;
+private JLabel donationRecievedLinkLabel;
+private JLabel contactLinkLabel;
+private JLabel feedbackLinkLabel;
+private JLabel followUsLabel;
+private JLabel rightReservedLabel;
+
+ public DashboardGUI() {
 
     setLayout(new BorderLayout());
     setBackground(Color.WHITE);
 
-    // Main dashboard content
+    // Main content panel
     JPanel mainPanel = new JPanel();
 
-    mainPanel.setLayout(new BoxLayout(
-            mainPanel,
-            BoxLayout.Y_AXIS
-    ));
+    mainPanel.setLayout(
+            new BoxLayout(mainPanel, BoxLayout.Y_AXIS)
+    );
 
     mainPanel.setBackground(Color.WHITE);
 
-    // Dashboard sections
+    // Add dashboard content
     mainPanel.add(createSummaryPanel());
     mainPanel.add(createFilterPanel());
     mainPanel.add(createDonationsPanel());
     mainPanel.add(createItemsPanel());
 
-    // Scroll the dashboard content
-    JScrollPane pageScrollPane = new JScrollPane(mainPanel);
+    // Make content scrollable
+    JScrollPane scrollPane = new JScrollPane(mainPanel);
 
-    pageScrollPane.setBorder(null);
+    scrollPane.setBorder(null);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-    pageScrollPane.getVerticalScrollBar()
-            .setUnitIncrement(16);
-
-    add(pageScrollPane, BorderLayout.CENTER);
+    // Add navigation bar, content and footer
+    add(createNavigationBar(), BorderLayout.NORTH);
+    add(scrollPane, BorderLayout.CENTER);
+    add(createFooter(), BorderLayout.SOUTH);
 }
+private JPanel createNavigationBar() {
 
-    private JPanel createNavigationBar() {
+    charityNameLabel = new JLabel("SikunyeCharity");
+    charityNameLabel.setFont(font1);
 
-        JPanel panel
-                = new JPanel(new BorderLayout());
+    homeLabel = new JLabel("Home");
+    homeLabel.setFont(font2);
 
-        panel.setBackground(Color.WHITE);
+    projectLabel = new JLabel("Projects");
+    projectLabel.setFont(font2);
 
-        panel.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(
-                                0, 0, 1, 0, BORDER
-                        ),
-                        BorderFactory.createEmptyBorder(
-                                12, 20, 12, 20
-                        )
-                )
-        );
-        JLabel logo
-                = new JLabel("Sikunye Charity");
+    beneficiariesLabel = new JLabel("Beneficiaries");
+    beneficiariesLabel.setFont(font2);
 
-        logo.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        18
-                )
-        );
+    donorLabel = new JLabel("Donor");
+    donorLabel.setFont(font2);
 
-        logo.setForeground(Color.BLACK);
+    itemsDonatedLabel = new JLabel("ItemsDonated");
+    itemsDonatedLabel.setFont(font2);
 
-        panel.add(
-                logo,
-                BorderLayout.WEST
-        );
-        JPanel navigation
-                = new JPanel(
-                        new FlowLayout(
-                                FlowLayout.RIGHT,
-                                25,
-                                0
-                        )
-                );
+    donationRecievedLabel = new JLabel("DonationReceived");
+    donationRecievedLabel.setFont(font2);
 
-        navigation.setBackground(Color.WHITE);
+    contactLabel = new JLabel("Contact");
+    contactLabel.setFont(font2);
 
-        String[] links = {
-            "Home",
-            "Projects",
-            "Donor",
-            "ItemsDonated",
-            "Donations Received",
-            "Contact"
-        };
+    // Navigation panel
+    headerPanel.setLayout(
+            new BoxLayout(headerPanel, BoxLayout.X_AXIS)
+    );
 
-        for (String link : links) {
+    Dimension panelHeaderSize = new Dimension(1390, 60);
 
-            JLabel navLabel
-                    = new JLabel(link);
+    headerPanel.setPreferredSize(panelHeaderSize);
+    headerPanel.setMinimumSize(panelHeaderSize);
+    headerPanel.setMaximumSize(panelHeaderSize);
 
-            navLabel.setFont(
-                    new Font(
-                            "Arial",
-                            Font.PLAIN,
-                            12
-                    )
-            );
+    headerPanel.setOpaque(true);
+    headerPanel.setBackground(Color.WHITE);
 
-            if (link.equals(
-                    "Donations Received"
-            )) {
+    headerPanel.setBorder(
+            new MatteBorder(0, 0, 2, 0, color1)
+    );
 
-                navLabel.setForeground(BLUE);
+    navLinksPanel.setLayout(
+            new FlowLayout(FlowLayout.LEADING, 18, 18)
+    );
 
-                navLabel.setFont(
-                        new Font(
-                                "Arial",
-                                Font.BOLD,
-                                12
-                        )
-                );
+    navLinksPanel.setOpaque(false);
 
-            } else {
+    navLinksPanel.add(homeLabel);
+    navLinksPanel.add(projectLabel);
+    navLinksPanel.add(beneficiariesLabel);
+    navLinksPanel.add(donorLabel);
+    navLinksPanel.add(itemsDonatedLabel);
+    navLinksPanel.add(donationRecievedLabel);
+    navLinksPanel.add(contactLabel);
 
-                navLabel.setForeground(
-                        Color.DARK_GRAY
-                );
-            }
+    headerPanel.add(
+            Box.createRigidArea(new Dimension(50, 0))
+    );
 
-            navigation.add(navLabel);
-        }
+    headerPanel.add(charityNameLabel);
 
-        panel.add(
-                navigation,
-                BorderLayout.EAST
-        );
+    headerPanel.add(
+            Box.createRigidArea(new Dimension(150, 0))
+    );
 
-        return panel;
-    }
+    headerPanel.add(navLinksPanel);
+
+    return headerPanel;
+}
+    
+    
     
 
     private JPanel createSummaryPanel() {
@@ -564,26 +573,26 @@ public class DashboardGUI extends JPanel {
             }
         };
 
-//        try {
-//            DonationDAO donationDao = new DonationDAO();
-//            List<Donation> donations = donationDao.getAllDonations(); // fetch from DB
-//            for (Donation d : donations) {
-//                donationModel.addRow(new Object[]{
-//                    d.getDonationID(),
-//                    d.getDonorID(),
-//                    d.getProjectID(),
-//                    d.getDonationType(),
-//                    d.getAmount(),
-//                    d.getPaymentStatus(),
-//                    d.getPaymentDate(),
-//                    d.isReceiptGenerated(),
-//                    d.getDateReceived(),
-//                    "View | Edit"
-//                });
-//            }
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(this, "Error loading donations: " + e.getMessage());
-//        }
+        try {
+            DonationDAO donationDao = new DonationDAO();
+            List<Donation> donations = donationDao.getAllDonations(); // fetch from DB
+            for (Donation d : donations) {
+                donationModel.addRow(new Object[]{
+                    d.getDonationID(),
+                    d.getDonorID(),
+                    d.getProjectID(),
+                    d.getDonationType(),
+                    d.getAmount(),
+                    d.getPaymentStatus(),
+                    d.getPaymentDate(),
+                    d.isReceiptGenerated(),
+                    d.getDateReceived(),
+                    "View | Edit"
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading donations: " + e.getMessage());
+        }
 
         donationsTable
                 = new JTable(
@@ -722,21 +731,21 @@ public class DashboardGUI extends JPanel {
             }
         };
 
-//        try {
-//            DonationItemDAO itemDao = new DonationItemDAO();
-//            List<DonationItem> items = itemDao.getAllDonationItems(); // fetch from DB
-//            for (DonationItem i : items) {
-//                itemModel.addRow(new Object[]{
-//                    i.getDonationItemID(),
-//                    i.getDonationID(),
-//                    i.getItemID(),
-//                    i.getQuantity(),
-//                    i.getCondition()
-//                });
-//            }
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(this, "Error loading items: " + e.getMessage());
-//        }
+        try {
+            DonationItemDAO itemDao = new DonationItemDAO();
+            List<DonationItem> items = itemDao.getAllDonationItems(); // fetch from DB
+            for (DonationItem i : items) {
+                itemModel.addRow(new Object[]{
+                    i.getDonationItemID(),
+                    i.getDonationID(),
+                    i.getItemID(),
+                    i.getQuantity(),
+                    i.getCondition()
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading items: " + e.getMessage());
+        }
 
         itemsTable
                 = new JTable(
@@ -1231,249 +1240,174 @@ public class DashboardGUI extends JPanel {
 
     private JPanel createFooter() {
 
-        JPanel footer
-                = new JPanel(
-                        new GridLayout(
-                                1,
-                                3,
-                                30,
-                                0
-                        )
-                );
+        charityNameFooterLabel = new JLabel("Sikunye Charity");
+charityNameFooterLabel.setForeground(color2);
+charityNameFooterLabel.setFont(font1);
 
-        footer.setBackground(NAVY);
+charitySloganLabel = new JLabel("Together we are one");
+charitySloganLabel.setForeground(color2);
+charitySloganLabel.setFont(font5);
 
-        footer.setBorder(
-                BorderFactory.createEmptyBorder(
-                        15,
-                        20,
-                        15,
-                        20
-                )
-        );
+quickLinkLabel = new JLabel("Quick Links");
+quickLinkLabel.setForeground(color2);
+quickLinkLabel.setFont(font1);
 
-        JPanel about
-                = new JPanel();
+homeLinkLabel = new JLabel("Home");
+homeLinkLabel.setForeground(color2);
+homeLinkLabel.setFont(font4);
 
-        about.setLayout(
-                new BoxLayout(
-                        about,
-                        BoxLayout.Y_AXIS
-                )
-        );
+itemsDonatedLinkLabel = new JLabel("ItemsDonated");
+itemsDonatedLinkLabel.setForeground(color2);
+itemsDonatedLinkLabel.setFont(font4);
 
-        about.setOpaque(false);
+projectLinkLabel = new JLabel("Projects");
+projectLinkLabel.setForeground(color2);
+projectLinkLabel.setFont(font4);
 
-        JLabel aboutTitle
-                = new JLabel(
-                        "Sikunye Charity"
-                );
+beneficiariesLinkLabel = new JLabel("Beneficiaries");
+beneficiariesLinkLabel.setForeground(color2);
+beneficiariesLinkLabel.setFont(font4);
 
-        aboutTitle.setForeground(
-                Color.WHITE
-        );
+donorLinkLabel = new JLabel("Donor");
+donorLinkLabel.setForeground(color2);
+donorLinkLabel.setFont(font4);
 
-        aboutTitle.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        14
-                )
-        );
+donationRecievedLinkLabel = new JLabel("DonationsRecieved");
+donationRecievedLinkLabel.setForeground(color2);
+donationRecievedLinkLabel.setFont(font4);
 
-        JLabel aboutText
-                = new JLabel(
-                        "<html>Sikunye Charity connects communities through<br>"
-                        + "compassion, transparency, and support. Every<br>"
-                        + "donation is tracked responsibly to ensure help<br>"
-                        + "reaches those who need it most.</html>"
-                );
+contactLinkLabel = new JLabel("Contact");
+contactLinkLabel.setForeground(color2);
+contactLinkLabel.setFont(font4);
 
-        aboutText.setForeground(
-                new Color(
-                        220,
-                        225,
-                        230
-                )
-        );
+feedbackLinkLabel = new JLabel("Feedback");
+feedbackLinkLabel.setForeground(color2);
+feedbackLinkLabel.setFont(font4);
 
-        aboutText.setFont(
-                new Font(
-                        "Arial",
-                        Font.PLAIN,
-                        10
-                )
-        );
+followUsLabel = new JLabel("Follow us");
+followUsLabel.setForeground(color2);
+followUsLabel.setFont(font1);
 
-        about.add(aboutTitle);
+rightReservedLabel = new JLabel(
+    "© 2020 SikunyeCharity.All rights reserved"
+);
+rightReservedLabel.setForeground(color2);
+rightReservedLabel.setFont(font6);
 
-        about.add(
-                Box.createVerticalStrut(6)
-        );
+// Charity information section
+charityInfoFooterPanel.setLayout(
+    new BoxLayout(charityInfoFooterPanel, BoxLayout.Y_AXIS)
+);
+charityInfoFooterPanel.setOpaque(false);
 
-        about.add(aboutText);
+charityInfoFooterPanel.add(
+    Box.createRigidArea(new Dimension(20, 20))
+);
+charityInfoFooterPanel.add(charityNameFooterLabel);
 
-        JPanel links
-                = new JPanel();
+charityInfoFooterPanel.add(
+    Box.createRigidArea(new Dimension(20, 20))
+);
+charityInfoFooterPanel.add(charitySloganLabel);
 
-        links.setLayout(
-                new BoxLayout(
-                        links,
-                        BoxLayout.Y_AXIS
-                )
-        );
 
-        links.setOpaque(false);
+// Quick Links section
+quickLinksPanel.setLayout(new GridLayout(9, 1));
+quickLinksPanel.setOpaque(false);
 
-        JLabel linksTitle
-                = new JLabel(
-                        "Quick Links"
-                );
+quickLinksPanel.add(quickLinkLabel);
+quickLinksPanel.add(homeLinkLabel);
+quickLinksPanel.add(itemsDonatedLinkLabel);
+quickLinksPanel.add(projectLinkLabel);
+quickLinksPanel.add(beneficiariesLinkLabel);
+quickLinksPanel.add(donorLinkLabel);
+quickLinksPanel.add(donationRecievedLinkLabel);
+quickLinksPanel.add(contactLinkLabel);
+quickLinksPanel.add(feedbackLinkLabel);
 
-        linksTitle.setForeground(
-                Color.WHITE
-        );
 
-        linksTitle.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        14
-                )
-        );
+// Social media section
+sociallmediaLinkPanel.setLayout(
+    new BoxLayout(sociallmediaLinkPanel, BoxLayout.Y_AXIS)
+);
+sociallmediaLinkPanel.setOpaque(false);
 
-        links.add(linksTitle);
+sociallmediaLinkPanel.add(followUsLabel);
 
-        String[] quickLinks = {
-            "Home",
-            "Projects",
-            "Donor",
-            "ItemsDonated",
-            "Donations Received"
+socialIconPanel.setLayout(new FlowLayout());
+socialIconPanel.setBorder(
+    new EmptyBorder(10, 20, 10, 20)
+);
+socialIconPanel.setOpaque(false);
 
-        };
 
-        for (String link : quickLinks) {
+// Facebook icon
+URL facebookUrl = getClass().getResource("/Facebook.png");
+ImageIcon facebook = new ImageIcon(facebookUrl);
+JLabel facebookIcon = new JLabel(facebook);
 
-            JLabel label
-                    = new JLabel(
-                            "> " + link
-                    );
+// Instagram icon
+URL instagramUrl = getClass().getResource("/Instagram.png");
+ImageIcon instagram = new ImageIcon(instagramUrl);
+JLabel instagramIcon = new JLabel(instagram);
 
-            label.setForeground(
-                    new Color(
-                            220,
-                            225,
-                            230
-                    )
-            );
+// LinkedIn icon
+URL linkedinUrl = getClass().getResource("/Linkedin.png");
+ImageIcon linkedin = new ImageIcon(linkedinUrl);
+JLabel linkedinIcon = new JLabel(linkedin);
 
-            label.setFont(
-                    new Font(
-                            "Arial",
-                            Font.PLAIN,
-                            10
-                    )
-            );
+socialIconPanel.add(facebookIcon);
+socialIconPanel.add(instagramIcon);
+socialIconPanel.add(linkedinIcon);
 
-            links.add(label);
-        }
+sociallmediaLinkPanel.add(socialIconPanel);
 
-        JPanel contact
-                = new JPanel();
 
-        contact.setLayout(
-                new BoxLayout(
-                        contact,
-                        BoxLayout.Y_AXIS
-                )
-        );
+// Copyright section
+rightReservedPanel.setLayout(new FlowLayout());
+rightReservedPanel.setOpaque(true);
+rightReservedPanel.setBackground(color5);
+rightReservedPanel.setBorder(
+    new LineBorder(color6, 1)
+);
 
-        contact.setOpaque(false);
+rightReservedPanel.add(rightReservedLabel);
 
-        JLabel contactTitle
-                = new JLabel(
-                        "Contact Information"
-                );
 
-        contactTitle.setForeground(
-                Color.WHITE
-        );
+// Main footer panel
+footerPanel.setLayout(new GridLayout(1, 3, 10, 0));
+footerPanel.setOpaque(true);
+footerPanel.setBackground(color5);
+footerPanel.setBorder(
+    new EmptyBorder(10, 20, 10, 20)
+);
 
-        contactTitle.setFont(
-                new Font(
-                        "Arial",
-                        Font.BOLD,
-                        14
-                )
-        );
+footerPanel.add(charityInfoFooterPanel);
+footerPanel.add(quickLinksPanel);
+footerPanel.add(sociallmediaLinkPanel);
 
-        JLabel email
-                = new JLabel(
-                        "Email: help@sikunye.org"
-                );
+JPanel footerContainer = new JPanel();
 
-        JLabel phone
-                = new JLabel(
-                        "Phone: +27 71 234 5678"
-                );
+footerContainer.setLayout(
+        new BoxLayout(footerContainer, BoxLayout.Y_AXIS)
+);
 
-        JLabel location
-                = new JLabel(
-                        "Location: Johannesburg, South Africa"
-                );
+footerContainer.add(footerPanel);
+footerContainer.add(rightReservedPanel);
 
-        for (JLabel label
-                : new JLabel[]{
-                    email,
-                    phone,
-                    location
-                }) {
+return footerContainer;
 
-            label.setForeground(
-                    new Color(
-                            220,
-                            225,
-                            230
-                    )
-            );
-
-            label.setFont(
-                    new Font(
-                            "Arial",
-                            Font.PLAIN,
-                            10
-                    )
-            );
-        }
-
-        contact.add(contactTitle);
-
-        contact.add(
-                Box.createVerticalStrut(6)
-        );
-
-        contact.add(email);
-        contact.add(phone);
-        contact.add(location);
-
-        footer.add(about);
-        footer.add(links);
-        footer.add(contact);
-
-        return footer;
+    
     }
-
-    public static void main(String[] args) {
+    
+   public static void main(String[] args) {
 
     SwingUtilities.invokeLater(() -> {
 
-        JFrame frame = new JFrame("Sikunye Charity Dashboard");
+        JFrame frame = new JFrame("Sikunye Charity");
 
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 850);
-
         frame.setLocationRelativeTo(null);
 
         frame.setContentPane(new DashboardGUI());
