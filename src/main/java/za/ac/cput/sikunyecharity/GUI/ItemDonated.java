@@ -1,6 +1,12 @@
-package za.ac.cput.sikunyecharity.gui;
+package za.ac.cput.sikunyecharity.GUI;
 
-
+import za.ac.cput.sikunyecharity.DAO.BeneficiaryDAO;
+import za.ac.cput.sikunyecharity.DAO.BeneficiaryNeedsDAO;
+import za.ac.cput.sikunyecharity.DAO.ItemDonatedDAO;
+import za.ac.cput.sikunyecharity.Domain.Beneficiary;
+import za.ac.cput.sikunyecharity.Domain.BeneficiaryNeed;
+import za.ac.cput.sikunyecharity.Domain.ItemDistributed;
+import za.ac.cput.sikunyecharity.Domain.ItemDonatedModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,13 +21,6 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import za.ac.cput.mavenproject6.domain.ItemDistributed;
-import za.ac.cput.mavenproject6.domain.ItemDonatedModel;
-import za.ac.cput.sikunyecharity.DAO.BeneficiaryDAO;
-import za.ac.cput.sikunyecharity.DAO.BeneficiaryNeedsDAO;
-import za.ac.cput.sikunyecharity.Domain.Beneficiary;
-import za.ac.cput.sikunyecharity.Domain.BeneficiaryNeed;
-import za.ac.cput.sikunyecharity.dao.ItemDonatedDAO;
 
 public class ItemDonated extends JPanel {
 
@@ -360,30 +359,30 @@ public class ItemDonated extends JPanel {
         dialog.add(scrollPane, BorderLayout.CENTER);
 
         try {
-            BeneficiaryDAO benDAO = new BeneficiaryDAO();
-            BeneficiaryNeedsDAO needsDAO = new BeneficiaryNeedsDAO();
+            BeneficiaryDAO benDAO = new BeneficiaryDAO(); // Uses BeneficiaryDAO[cite: 10]
+            BeneficiaryNeedsDAO needsDAO = new BeneficiaryNeedsDAO(); // Uses BeneficiaryNeedsDAO[cite: 10]
 
-            List<Beneficiary> beneficiaries = benDAO.getAll(); 
+            List<Beneficiary> beneficiaries = benDAO.getAll(); // Uses Beneficiary
 
             for (Beneficiary b : beneficiaries) {
-                String fullName = b.getFirstName() + " " + b.getLastName();
+                String fullName = b.getFirstName() + " " + b.getLastName(); // Uses Beneficiary[cite: 10, 11]
                 
                 StringBuilder needsSummary = new StringBuilder();
                 try {
-                    List<BeneficiaryNeed> needs = needsDAO.getForBeneficiary(b.getBeneficiaryId()); 
+                    List<BeneficiaryNeed> needs = needsDAO.getForBeneficiary(b.getBeneficiaryId()); // Uses BeneficiaryNeed[cite: 10, 11]
                     for (BeneficiaryNeed n : needs) {
                         if (needsSummary.length() > 0) needsSummary.append(", ");
-                        needsSummary.append(n.getNeedDescription()); 
+                        needsSummary.append(n.getNeedDescription()); // Uses BeneficiaryNeed[cite: 10, 11]
                     }
                 } catch (Exception ignored) {}
 
                 String needsText = needsSummary.length() > 0 ? needsSummary.toString() : "None Assigned";
 
                 benModel.addRow(new Object[]{
-                    b.getBeneficiaryId(),
+                    b.getBeneficiaryId(), // Uses Beneficiary[cite: 10, 11]
                     fullName,
                     needsText,
-                    b.getLivingSituation()
+                    b.getLivingSituation() // Uses Beneficiary[cite: 10, 11]
                 });
             }
         } catch (Exception ex) {
@@ -718,5 +717,26 @@ public class ItemDonated extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         return table;
+    }
+
+    // MAIN METHOD: Allows running this GUI standalone for testing
+    public static void main(String[] args) {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Sikunye Charity - Item Inventory & Distribution");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1200, 750);
+            frame.setLocationRelativeTo(null);
+            frame.add(new ItemDonated());
+            frame.setVisible(true);
+        });
     }
 }

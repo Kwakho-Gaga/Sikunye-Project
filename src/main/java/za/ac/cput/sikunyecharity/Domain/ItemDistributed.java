@@ -1,4 +1,4 @@
-package za.ac.cput.mavenproject6.domain;
+package za.ac.cput.sikunyecharity.Domain;
 
 import java.util.Date;
 
@@ -9,6 +9,8 @@ public class ItemDistributed {
     private String beneficiaryName;
     private int distributedQuantity;
     private Date distributionDate;
+
+    public ItemDistributed() {}
 
     public ItemDistributed(int distributionID, int itemID, int beneficiaryID, String beneficiaryName, int distributedQuantity, Date distributionDate) {
         this.distributionID = distributionID;
@@ -28,9 +30,20 @@ public class ItemDistributed {
     }
 
     public int getDistributionID() { return distributionID; }
+    public void setDistributionID(int distributionID) { this.distributionID = distributionID; }
+
     public int getItemID() { return itemID; }
+    public void setItemID(int itemID) { this.itemID = itemID; }
+
     public int getBeneficiaryID() { return beneficiaryID; }
+    public void setBeneficiaryID(int beneficiaryID) { this.beneficiaryID = beneficiaryID; }
+
     public String getBeneficiaryName() { return beneficiaryName; }
+    public void setBeneficiaryName(String beneficiaryName) { this.beneficiaryName = beneficiaryName; }
+
     public int getDistributedQuantity() { return distributedQuantity; }
+    public void setDistributedQuantity(int distributedQuantity) { this.distributedQuantity = distributedQuantity; }
+
     public Date getDistributionDate() { return distributionDate; }
+    public void setDistributionDate(Date distributionDate) { this.distributionDate = distributionDate; }
 }

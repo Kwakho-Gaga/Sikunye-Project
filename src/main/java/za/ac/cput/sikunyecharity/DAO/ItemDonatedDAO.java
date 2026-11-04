@@ -1,18 +1,17 @@
-package za.ac.cput.sikunyecharity.dao;
+package za.ac.cput.sikunyecharity.DAO;
 
-
-import za.ac.cput.mavenproject6.domain.ItemDistributed;
-import za.ac.cput.mavenproject6.domain.ItemDonatedModel;
+import za.ac.cput.sikunyecharity.DBConection.DBConnection;
+import za.ac.cput.sikunyecharity.Domain.ItemDistributed;
+import za.ac.cput.sikunyecharity.Domain.ItemDonatedModel;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import za.ac.cput.sikunyecharity.DBConection.DBConnection;
 
 public class ItemDonatedDAO {
 
     private Connection getConnection() throws SQLException {
-        return DBConnection.derbyConnection(); 
+        return DBConnection.derbyConnection();
     }
 
     public List<ItemDonatedModel> getAllInventory() throws SQLException {

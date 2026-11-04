@@ -41,7 +41,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(18);
         setContentPane(scrollPane);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(980, 700));
         setSize(1180, 900);
         setLocationRelativeTo(null);
@@ -69,17 +69,25 @@ public class ProjectsPage extends JFrame implements ActionListener {
         links.setOpaque(false);
         String[] items = {"Home", "Projects", "Beneficiaries", "Donor",
             "ItemsDonated", "DonationsRecieved", "Contact"};
+
         for (String item : items) {
             JLabel link = new JLabel(item);
             link.setFont(new Font("SansSerif", Font.PLAIN, 16));
-            link.setForeground("Projects".equals(item) ? new Color(65, 186, 207) : TEXT);
-            link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            if ("Home".equals(item) || "Beneficiaries".equals(item)
-                    || "Contact".equals(item)) {
-                AppNavigation.link(link, this, item);
+            
+            // Highlight Projects as active page tab
+            boolean isActive = "Projects".equalsIgnoreCase(item);
+            link.setForeground(isActive ? new Color(65, 186, 207) : TEXT);
+            if (isActive) {
+                link.setFont(new Font("SansSerif", Font.BOLD, 16));
             }
+            
+            link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            
+            // Connect ALL navigation links to AppNavigation
+            AppNavigation.link(link, this, item);
             links.add(link);
         }
+
         c.gridx = 1;
         c.weightx = 0;
         c.anchor = GridBagConstraints.EAST;
@@ -282,7 +290,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
     }
 
     private JPanel createFooter() {
-        return HomeFooter.create(this);
+        return new FooterPanel(this);
     }
 
     private JLabel detailLabel(String name, String value) {
@@ -335,7 +343,6 @@ public class ProjectsPage extends JFrame implements ActionListener {
         }
     }
 
-    /** Makes the page fill the viewport while retaining vertical scrolling. */
     private static final class PagePanel extends JPanel implements Scrollable {
         @Override public Dimension getPreferredScrollableViewportSize() { return getPreferredSize(); }
         @Override public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) { return 18; }
@@ -392,11 +399,6 @@ public class ProjectsPage extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new ProjectsPage().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new ProjectsPage().setVisible(true));
     }
 }

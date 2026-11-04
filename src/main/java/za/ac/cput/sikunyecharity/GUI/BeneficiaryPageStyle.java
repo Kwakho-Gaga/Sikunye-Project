@@ -42,7 +42,7 @@ final class BeneficiaryPageStyle {
         content.setBackground(BACKGROUND);
         page.add(content, BorderLayout.CENTER);
 
-        page.add(HomeFooter.create(frame instanceof BeneficiariesMenu ? frame : null),
+        page.add(new FooterPanel(frame instanceof BeneficiariesMenu ? frame : null),
                 BorderLayout.SOUTH);
 
         frame.setContentPane(page);

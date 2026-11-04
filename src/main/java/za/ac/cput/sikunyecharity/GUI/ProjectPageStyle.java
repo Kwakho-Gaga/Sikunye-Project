@@ -7,8 +7,8 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.Scrollable;
 import javax.swing.JTextArea;
+import javax.swing.Scrollable;
 import javax.swing.border.EmptyBorder;
 
 /** Shared visual elements for the three project detail pages. */
@@ -49,7 +49,7 @@ final class ProjectPageStyle {
     }
 
     static JPanel createFooter() {
-        return HomeFooter.create(null);
+        return new FooterPanel();
     }
 
     static final class ScrollableContent extends JPanel implements Scrollable {

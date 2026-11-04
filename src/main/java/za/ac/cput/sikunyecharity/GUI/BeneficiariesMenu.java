@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
@@ -23,9 +24,16 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
 
     public BeneficiariesMenu() {
         super("Sikunye Charity - Beneficiaries");
+        setLayout(new BorderLayout());
 
+        // Standardized Top Navigation Header
+        add(new HeaderPanel(this, "Beneficiaries"), BorderLayout.NORTH);
+
+        // Center Content Area
         JPanel content = new JPanel(new BorderLayout(0, 24));
         content.setBorder(new EmptyBorder(38, 90, 40, 90));
+        content.setBackground(new Color(248, 244, 250));
+
         JPanel introduction = new JPanel(new GridLayout(2, 1, 0, 5));
         introduction.setOpaque(false);
         JLabel heading = new JLabel("Beneficiary management");
@@ -56,7 +64,17 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
         btnBeneficiaries.addActionListener(this);
         btnAssignments.addActionListener(this);
         btnBack.addActionListener(this);
-        BeneficiaryPageStyle.setup(this, "Beneficiaries", "Sikunye Charity System", content);
+
+        JScrollPane scrollPane = new JScrollPane(content);
+        scrollPane.setBorder(null);
+        add(scrollPane, BorderLayout.CENTER);
+
+        // Standardized Bottom Footer
+        add(new FooterPanel(), BorderLayout.SOUTH);
+
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(1280, 850);
+        setLocationRelativeTo(null);
     }
 
     private JButton choice(String title, String description) {
@@ -92,11 +110,6 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new BeneficiariesMenu().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new BeneficiariesMenu().setVisible(true));
     }
 }
