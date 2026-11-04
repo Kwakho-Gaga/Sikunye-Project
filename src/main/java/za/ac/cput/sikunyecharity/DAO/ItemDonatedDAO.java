@@ -67,7 +67,7 @@ public class ItemDonatedDAO {
     }
 
     public void updateInventoryItem(ItemDonatedModel item) throws SQLException {
-        String sql = "UPDATE ITEMS_DONATED SET receiptID = ?, itemName = ?, quantity = ?, itemCondition = ? WHERE itemID = ?";
+        String sql = "UPDATE ITEMs_DONATED SET receiptID = ?, itemName = ?, quantity = ?, itemCondition = ? WHERE itemID = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, item.getReceiptID());
