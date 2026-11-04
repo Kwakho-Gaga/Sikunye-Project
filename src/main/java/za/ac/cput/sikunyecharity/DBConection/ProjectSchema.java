@@ -46,17 +46,6 @@ public final class ProjectSchema {
                         + "RegistrationDate DATE NOT NULL)");
             }
         }
-        if (!tableExists(connection, "PROJECTDONATION")) {
-            try (Statement statement = connection.createStatement()) {
-                statement.executeUpdate("CREATE TABLE ProjectDonation ("
-                        + "DonationID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
-                        + "ProjectID VARCHAR(20) NOT NULL REFERENCES ProjectTable(ProjectID), "
-                        + "DonorName VARCHAR(120) NOT NULL, "
-                        + "DonorEmail VARCHAR(254) NOT NULL, "
-                        + "Amount DECIMAL(12,2) NOT NULL, "
-                        + "DonationDate DATE NOT NULL)");
-            }
-        }
         seedProjects(connection);
     }
 

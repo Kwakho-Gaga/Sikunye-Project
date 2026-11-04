@@ -6,6 +6,7 @@ package za.ac.cput.sikunyecharity.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -966,6 +967,13 @@ public class DashboardGUI extends JPanel {
     }
 
     private void showLoginDialog() {
+        if (requestAdminAccess(this)) {
+            DonationGUI donationGUI = new DonationGUI();
+            donationGUI.setVisible(true);
+        }
+    }
+
+    public static boolean requestAdminAccess(Component parent) {
 
         JTextField usernameField
                 = new JTextField();
@@ -982,7 +990,7 @@ public class DashboardGUI extends JPanel {
 
         int option
                 = JOptionPane.showConfirmDialog(
-                        this,
+                        parent,
                         fields,
                         "Administrator Login",
                         JOptionPane.OK_CANCEL_OPTION,
@@ -990,7 +998,7 @@ public class DashboardGUI extends JPanel {
                 );
 
         if (option != JOptionPane.OK_OPTION) {
-            return;
+            return false;
         }
 
         String username
@@ -1007,38 +1015,36 @@ public class DashboardGUI extends JPanel {
                 || password.isEmpty()) {
 
             JOptionPane.showMessageDialog(
-                    this,
+                    parent,
                     "Please enter your username and password.",
                     "Login Error",
                     JOptionPane.WARNING_MESSAGE
             );
 
-            return;
+            return false;
         }
         if (username.equals(ADMIN_USERNAME)
                 && password.equals(ADMIN_PASSWORD)) {
 
             JOptionPane.showMessageDialog(
-                    this,
+                    parent,
                     "Login successful!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );
 
-            DonationGUI donationGUI
-                    = new DonationGUI();
-
-            donationGUI.setVisible(true);
+            return true;
 
         } else {
 
             JOptionPane.showMessageDialog(
-                    this,
+                    parent,
                     "Invalid username or password.",
                     "Login Failed",
                     JOptionPane.ERROR_MESSAGE
             );
         }
+        return false;
     }
 
     private void showDonationDetails(int row) {

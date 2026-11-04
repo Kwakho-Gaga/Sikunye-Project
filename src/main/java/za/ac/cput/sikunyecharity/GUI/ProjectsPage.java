@@ -23,6 +23,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
     private JButton btnFoodProject;
     private JButton btnCareProject;
     private JButton btnBack;
+    private JButton btnManageDonations;
 
     public ProjectsPage() {
         super("Sikunye Charity - Projects");
@@ -150,6 +151,11 @@ public class ProjectsPage extends JFrame implements ActionListener {
         btnBack.setFont(new Font("SansSerif", Font.PLAIN, 16));
         btnBack.addActionListener(this);
         backRow.add(btnBack);
+        backRow.add(Box.createHorizontalStrut(16));
+        btnManageDonations = new FlatButton("Manage project donations", 220, 36, 0);
+        btnManageDonations.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        btnManageDonations.addActionListener(this);
+        backRow.add(btnManageDonations);
         section.add(backRow);
         return section;
     }
@@ -267,6 +273,10 @@ public class ProjectsPage extends JFrame implements ActionListener {
             openProject(2);
         } else if (source == btnBack) {
             AppNavigation.open(this, "Home");
+        } else if (source == btnManageDonations && DashboardGUI.requestAdminAccess(this)) {
+            ProjecTable table = new ProjecTable(this);
+            setVisible(false);
+            table.setVisible(true);
         }
     }
 

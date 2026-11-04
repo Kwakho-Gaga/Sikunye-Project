@@ -18,9 +18,9 @@ public class DBConnection {
     public static Connection derbyConnection() throws SQLException {
 
         
-            String DATABASE_URL = "jdbc:derby://localhost:1527/SikunyeDatabase";
-            String username = "administrator";
-            String password = "password";
+            String DATABASE_URL = "jdbc:derby://localhost:1527/SikunyeDB";
+            String username = "sikunye_use";
+            String password = "iWashere@12";
             Connection connection= DriverManager.getConnection(DATABASE_URL, username, password);
       
             

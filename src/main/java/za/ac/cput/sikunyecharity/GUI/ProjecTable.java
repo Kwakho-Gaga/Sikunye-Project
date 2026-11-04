@@ -8,7 +8,8 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,17 +17,18 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-//import za.ac.cput.sikunyecharity.DAO.DonationDAO;
+import za.ac.cput.sikunyecharity.DAO.ProjectDonationDAO;
 import za.ac.cput.sikunyecharity.DAO.ProjectDAO;
 import za.ac.cput.sikunyecharity.DAO.ProjectRegistrationDAO;
-//import za.ac.cput.sikunyecharity.Domain.Donation;
 import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.Domain.ProjectDonationRecord;
 import za.ac.cput.sikunyecharity.Domain.ProjectRegistration;
 
 /**
@@ -49,26 +51,34 @@ public class ProjecTable extends JFrame implements ActionListener {
 
     // Table
     private JTable tblProjects;
+    private JTable tblDonations;
 
     private DefaultTableModel projectTableModel;
+    private DefaultTableModel donationTableModel;
 
     private final ProjectDAO projectDAO = new ProjectDAO();
+    private final ProjectDonationDAO donationDAO = new ProjectDonationDAO();
     private final ProjectRegistrationDAO registrationDAO = new ProjectRegistrationDAO();
-    //private final DonationDAO donationDAO = new DonationDAO();
+    private final ProjectsPage projectsPage;
 
     private JButton btnRegister;
-    private JButton btnDonate;
     private JButton btnClear;
     private JButton btnRefresh;
+    private JButton btnBack;
 
     // Constructor
     public ProjecTable() {
+        this(null);
+    }
 
-        setTitle("Sikunye Charity - Projects");
+    public ProjecTable(ProjectsPage projectsPage) {
+        this.projectsPage = projectsPage;
+
+        setTitle("Sikunye Charity - Project Donations");
 
         setSize(1200, 700);
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         setLocationRelativeTo(null);
 
@@ -77,6 +87,15 @@ public class ProjecTable extends JFrame implements ActionListener {
         createInterface();
 
         loadProjects();
+        loadDonations(null);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent event) {
+                if (ProjecTable.this.projectsPage != null) {
+                    ProjecTable.this.projectsPage.setVisible(true);
+                }
+            }
+        });
     }
 
     // Create interface
@@ -192,19 +211,19 @@ public class ProjecTable extends JFrame implements ActionListener {
         btnRegister
                 = new JButton("Register");
 
-        btnDonate
-                = new JButton("Donate");
-
         btnClear
                 = new JButton("Clear");
 
         btnRefresh
                 = new JButton("Refresh");
 
+        btnBack
+                = new JButton("Back to Projects");
+
         buttonPanel.add(btnRegister);
-        buttonPanel.add(btnDonate);
         buttonPanel.add(btnClear);
         buttonPanel.add(btnRefresh);
+        buttonPanel.add(btnBack);
 
         // Table
         String[] columns = {
@@ -236,6 +255,25 @@ public class ProjecTable extends JFrame implements ActionListener {
         JScrollPane scrollPane
                 = new JScrollPane(tblProjects);
 
+        String[] donationColumns = {
+            "Donation ID", "Donor ID", "Project ID", "Amount (R)",
+            "Payment Method", "Donation Date"
+        };
+        donationTableModel = new DefaultTableModel(donationColumns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tblDonations = new JTable(donationTableModel);
+        JPanel donationPanel = new JPanel(new BorderLayout());
+        donationPanel.add(new JLabel("Donations (select a project to filter)"), BorderLayout.NORTH);
+        donationPanel.add(new JScrollPane(tblDonations), BorderLayout.CENTER);
+
+        JSplitPane tables = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                scrollPane, donationPanel);
+        tables.setResizeWeight(0.45);
+
         // Bottom
         JPanel bottomPanel
                 = new JPanel(new BorderLayout());
@@ -246,9 +284,9 @@ public class ProjecTable extends JFrame implements ActionListener {
                 BorderLayout.NORTH
         );
 
-        // JTable BELOW buttons
+        // Project and donation tables below buttons
         bottomPanel.add(
-                scrollPane,
+                tables,
                 BorderLayout.CENTER
         );
 
@@ -260,11 +298,11 @@ public class ProjecTable extends JFrame implements ActionListener {
         // Events
         btnRegister.addActionListener(this);
 
-        btnDonate.addActionListener(this);
-
         btnClear.addActionListener(this);
 
         btnRefresh.addActionListener(this);
+
+        btnBack.addActionListener(this);
 
         // When user clicks a project
         tblProjects.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -283,19 +321,24 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         if (source == btnRegister) {
             registerUser();
-        } else if (source == btnDonate) {
-            makeDonation();
         } else if (source == btnClear) {
             clearFields();
         } else if (source == btnRefresh) {
             loadProjects();
+            if (selectedProjectId() == null) {
+                loadDonations(null);
+            }
+        } else if (source == btnBack) {
+            dispose();
         }
     }
 
     // Load projects from database
     private void loadProjects() {
 
+        String projectId = selectedProjectId();
         projectTableModel.setRowCount(0);
+        donationTableModel.setRowCount(0);
 
         try {
             List<Project> projects = projectDAO.getAllProjects();
@@ -310,6 +353,14 @@ public class ProjecTable extends JFrame implements ActionListener {
                     project.getEndDate(),
                     project.getGoalAmount()
                 });
+            }
+            if (projectId != null) {
+                for (int row = 0; row < projectTableModel.getRowCount(); row++) {
+                    if (projectId.equals(cellText(row, 0))) {
+                        tblProjects.setRowSelectionInterval(row, row);
+                        break;
+                    }
+                }
             }
 
         } catch (Exception e) {
@@ -362,6 +413,28 @@ public class ProjecTable extends JFrame implements ActionListener {
         txtGoalAmount.setText(
                 cellText(row, 7)
         );
+        loadDonations(cellText(row, 0));
+    }
+
+    private void loadDonations(String projectId) {
+        donationTableModel.setRowCount(0);
+        try {
+            List<ProjectDonationRecord> donations = donationDAO.getDonations(projectId);
+            for (ProjectDonationRecord donation : donations) {
+                donationTableModel.addRow(new Object[]{
+                    donation.getDonationId(),
+                    donation.getDonorId(),
+                    donation.getProjectId() == null
+                            ? "General Fund" : donation.getProjectId(),
+                    donation.getAmount(),
+                    donation.getPaymentMethod(),
+                    donation.getDonationDate()
+                });
+            }
+        } catch (Exception exception) {
+            JOptionPane.showMessageDialog(this,
+                    "Error loading project donations:\n" + exception.getMessage());
+        }
     }
 
     private String cellText(int row, int column) {
@@ -435,110 +508,6 @@ public class ProjecTable extends JFrame implements ActionListener {
         }
     }
 
-    // Make donation
-    private void makeDonation() {
-
-        String projectID = selectedProjectId();
-
-        String userName
-                = txtUserName.getText().trim();
-
-        String userEmail
-                = txtUserEmail.getText().trim();
-
-        if (projectID == null) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Please select a project first."
-            );
-
-            return;
-        }
-
-        if (!validUserDetails(userName, userEmail)) {
-            return;
-        }
-
-        String amountText
-                = JOptionPane.showInputDialog(
-                        this,
-                        "Enter donation amount (R):"
-                );
-
-        if (amountText == null
-                || amountText.trim().isEmpty()) {
-
-            return;
-        }
-
-        try {
-
-            BigDecimal amount
-                    = new BigDecimal(
-                            amountText.trim()
-                    );
-
-            if (amount.compareTo(
-                    BigDecimal.ZERO) <= 0) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Donation must be greater than R0."
-                );
-
-                return;
-            }
-
-            if (amount.scale() > 2 || amount.precision() - amount.scale() > 10) {
-                JOptionPane.showMessageDialog(this,
-                        "Enter an amount with at most two decimal places and ten whole digits.");
-                return;
-            }
-
-            saveDonation(
-                    projectID,
-                    userName,
-                    userEmail,
-                    amount
-            );
-
-        } catch (NumberFormatException e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Please enter a valid amount."
-            );
-        }
-    }
-
-    // Save donation
-    private void saveDonation(
-            String projectID,
-            String userName,
-            String userEmail,
-            BigDecimal amount) {
-
-        try {
-           // donationDAO.saveDonation(
-                //    new Donation(projectID, userName, userEmail, amount)
-            //);
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Donation of R" + amount + " was recorded. No payment was processed."
-            );
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Donation failed:\n"
-                    + e.getMessage()
-            );
-        }
-    }
-
     // Clear
     private void clearFields() {
 
@@ -555,6 +524,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         txtUserEmail.setText("");
 
         tblProjects.clearSelection();
+        loadDonations(null);
     }
 
     // Main
@@ -563,7 +533,9 @@ public class ProjecTable extends JFrame implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new ProjecTable().setVisible(true);
+                if (DashboardGUI.requestAdminAccess(null)) {
+                    new ProjecTable().setVisible(true);
+                }
             }
         });
     }
