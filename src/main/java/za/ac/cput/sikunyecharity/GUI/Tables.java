@@ -1,6 +1,5 @@
 package za.ac.cput.sikunyecharity.GUI;
 
-
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -47,8 +46,9 @@ public class Tables extends JFrame implements ActionListener {
 
     private final Font font6 = new Font("Inter", Font.BOLD, 14);
     private final Color color1 = new Color(0, 192, 232);
-
-    public Tables() {
+FeedbackGUI feedbackForm;
+ContactGUI contactForm;
+    public Tables(ContactGUI contactForm, FeedbackGUI feedbackForm) {
         super("Admin Login");
 
         buildLoginPanel();
@@ -120,16 +120,35 @@ public class Tables extends JFrame implements ActionListener {
                 cardLayout.show(mainPanel, "admin");
             } else {
                 JOptionPane.showMessageDialog(
-                    this,
-                    "Incorrect username or password.",
-                    "Login failed",
-                    JOptionPane.ERROR_MESSAGE
+                        this,
+                        "Incorrect username or password.",
+                        "Login failed",
+                        JOptionPane.ERROR_MESSAGE
                 );
             }
         }
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Tables().setVisible(true));
+
+        ContactGUI contact = new ContactGUI();
+        contact.setGUI();
+        contact.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        contact.setSize(1000, 900);
+        contact.setVisible(true);
+
+        FeedbackGUI feedback = new FeedbackGUI();
+        feedback.setGui();
+        feedback.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        feedback.pack();
+        feedback.setLocationRelativeTo(null);
+        feedback.setVisible(true);
+
+        Tables table = new Tables(contact,feedback);
+
+        table.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        table.setSize(1000, 900);
+        table.setVisible(true);
+
     }
 }

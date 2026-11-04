@@ -104,6 +104,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
     private JLabel feedbackLinkLabel;
     private JLabel followUsLabel;
     private JLabel rightReservedLabel;
+    private JLabel adminLabel;
     private String currentSelectedContact = "";
 
     Font font1 = new Font("Inter", Font.BOLD, 20);
@@ -113,8 +114,8 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
     Font font5 = new Font("Inter", Font.BOLD, 16);
     Font font6 = new Font("Inter", Font.BOLD, 14);
     Font font7 = new Font("Inter", Font.PLAIN, 17);
-    Font font8=new Font("Sanserif",Font.BOLD,17);
-    Font font9=new Font("Sanserif",Font.PLAIN,16);
+    Font font8 = new Font("Sanserif", Font.BOLD, 17);
+    Font font9 = new Font("Sanserif", Font.PLAIN, 16);
 
     Color color1 = new Color(0, 192, 232);
     Color color2 = Color.WHITE;
@@ -173,11 +174,11 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         charityNameLabel.setFont(font8);
 
         homeLabel = new JLabel("Home");
-        
- homeLabel .addMouseListener(new MouseAdapter() {
+
+        homeLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                 homeLabel .setForeground(color1);
+                homeLabel.setForeground(color1);
 
                 HomeGUI home = new HomeGUI();
                 // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
@@ -197,14 +198,13 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         beneficiariesLabel.setFont(font9);
         AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
         donorLabel = new JLabel("Donor");
-         donorLabel  .addMouseListener(new MouseAdapter() {
+        donorLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                 donorLabel  .setForeground(color1);
+                donorLabel.setForeground(color1);
 
                 DonationED donation = new DonationED();
                 // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
-               
 
                 donation.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 donation.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -213,8 +213,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
             }
         });
         donorLabel.setFont(font9);
-        
-        
+
         itemsDonatedLabel = new JLabel("ItemsDonated");
 //        itemsDonatedLabel  .addMouseListener(new MouseAdapter() {
 //            @Override
@@ -231,30 +230,23 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
 //            }
 //        });
         itemsDonatedLabel.setFont(font9);
-        
-        
-        
-        
+
         donationRecievedLabel = new JLabel("DonationRecieved");
-        
-        donationRecievedLabel  .addMouseListener(new MouseAdapter() {
+
+        donationRecievedLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                 
 
                 DashboardGUI dashboard = new DashboardGUI();
                 // Keep this line only if the FeedbackGUI constructor doesn't call setGui().
-               
 
-               //dashboard .setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-              // dashboard .setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //dashboard .setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                // dashboard .setExtendedState(JFrame.MAXIMIZED_BOTH);
                 //feedback.setLocationRelativeTo(ContactGUI.this);
-               dashboard .setVisible(true);
+                dashboard.setVisible(true);
             }
         });
-        
-        
-        
+
         donationRecievedLabel.setFont(font9);
         contactLabel = new JLabel("Contact");
 
@@ -478,7 +470,35 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         rightReservedLabel = new JLabel("© 2020 SikunyeCharity.All rights reserved");
         rightReservedLabel.setForeground(color2);
         rightReservedLabel.setFont(font6);
+        adminLabel = new JLabel("©admin");
+        adminLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                adminLabel.setForeground(color2);
 
+                ContactGUI contact = new ContactGUI();
+                contact.setGUI();
+                contact.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                contact.setSize(1000, 900);
+                contact.setVisible(true);
+
+                FeedbackGUI feedback = new FeedbackGUI();
+                feedback.setGui();
+                feedback.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                feedback.pack();
+                feedback.setLocationRelativeTo(null);
+                feedback.setVisible(true);
+
+                Tables table = new Tables(contact, feedback);
+
+                table.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                table.setSize(1000, 900);
+                table.setVisible(true);
+
+            }
+        });
+        adminLabel.setForeground(color2);
+        adminLabel.setFont(font3);
     }
 
     public void setGUI() {
@@ -517,7 +537,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         headerPanel.add(contactLabel);
         navBarPanel.add(Box.createRigidArea(new Dimension(50, 0)));
         navBarPanel.add(charityNameLabel);
-        navBarPanel.add(Box.createRigidArea(new Dimension(150, 0)));
+        navBarPanel.add(Box.createRigidArea(new Dimension(480, 0)));
         navBarPanel.add(headerPanel);
         centerPanel.setLayout(new GridLayout(2, 1, 0, 0));
         Dimension panelCenterSize = new Dimension(1390, 100);
@@ -713,7 +733,8 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         socialIconPanel.add(instagramIcon);
         socialIconPanel.add(linkedinIcon);
         sociallmediaLinkPanel.add(socialIconPanel);
-
+        sociallmediaLinkPanel.add(Box.createRigidArea(new Dimension(0, 50)));
+        sociallmediaLinkPanel.add(adminLabel);
         rightReservedPanel.setLayout(new FlowLayout());
         rightReservedPanel.setOpaque(true);
         rightReservedPanel.setBackground(color5);

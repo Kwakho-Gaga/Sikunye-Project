@@ -80,6 +80,8 @@ public class HomeGUI extends JFrame implements ActionListener {
     Font font5 = new Font("Inter", Font.BOLD, 16);
     Font font6 = new Font("Inter", Font.BOLD, 14);
     Font font7 = new Font("Inter", Font.PLAIN, 17);
+    Font font10=new Font("Sanserif",Font.BOLD,17);
+    Font font9=new Font("Sanserif",Font.PLAIN,16);
 
     Color color1 = new Color(0, 192, 232);
     Color color2 = Color.WHITE;
@@ -90,6 +92,7 @@ public class HomeGUI extends JFrame implements ActionListener {
     //strokein footer
     Color color6 = new Color(142, 142, 147);
     Color color7 = new Color(179, 179, 179);
+    
 
     private JPanel createPairPanel(JLabel heading, JLabel subHeading) {
         JPanel panel = new JPanel();
@@ -116,15 +119,15 @@ public class HomeGUI extends JFrame implements ActionListener {
         footerPanel = new JPanel();
         mainPanel = new JPanel();
         charityNameLabel = new JLabel("SikunyeCharity");
-        charityNameLabel.setFont(font1);
+        charityNameLabel.setFont(font10);
 
         homeLabel = new JLabel("Home");
-        homeLabel.setFont(font2);
+        homeLabel.setFont(font9);
         projectLabel = new JLabel("Projects");
-        projectLabel.setFont(font2);
+        projectLabel.setFont(font9);
         AppNavigation.link(projectLabel, this, "Projects");
         beneficiariesLabel = new JLabel("Beneficiaries");
-        beneficiariesLabel.setFont(font2);
+        beneficiariesLabel.setFont(font9);
         AppNavigation.link(beneficiariesLabel, this, "Beneficiaries");
         donorLabel = new JLabel("Donor");
         donorLabel  .addMouseListener(new MouseAdapter() {
@@ -142,12 +145,12 @@ public class HomeGUI extends JFrame implements ActionListener {
                 donation.setVisible(true);
             }
         });
-        donorLabel.setFont(font2);
+        donorLabel.setFont(font9);
         itemsDonatedLabel = new JLabel("ItemsDonated");
-        itemsDonatedLabel.setFont(font2);
+        itemsDonatedLabel.setFont(font9);
         
          donationRecievedLabel = new JLabel("DonationReceived");
-         donationRecievedLabel.setFont(font2);
+         donationRecievedLabel.setFont(font9);
         AppNavigation.link( donationRecievedLabel, this, "DonationReceived");
 
         contactLabel = new JLabel("Contact");
@@ -166,9 +169,9 @@ public class HomeGUI extends JFrame implements ActionListener {
                 contact.setVisible(true);
             }
         });
-        contactLabel.setFont(font2);
+        contactLabel.setFont(font9);
 
-        contactLabel.setFont(font2);
+        
 
         heading = new JLabel("Welcome to Sikunye Charity");
         heading.setFont(font8);
@@ -295,7 +298,7 @@ public class HomeGUI extends JFrame implements ActionListener {
 //       headerPanel.add(charityNamePanel);
         headerPanel.add(Box.createRigidArea(new Dimension(50, 0)));
         headerPanel.add(charityNameLabel);
-        headerPanel.add(Box.createRigidArea(new Dimension(150, 0)));
+        headerPanel.add(Box.createRigidArea(new Dimension(480, 0)));
         headerPanel.add(mainPanel);
 
         homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
