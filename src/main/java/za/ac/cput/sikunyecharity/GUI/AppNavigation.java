@@ -2,6 +2,7 @@ package za.ac.cput.sikunyecharity.GUI;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
@@ -47,6 +48,8 @@ public final class AppNavigation {
     }
 
     public static void open(JFrame current, String destination) {
+        if (destination == null) return;
+
         JFrame next;
         switch (destination) {
             case "Home":
@@ -85,8 +88,18 @@ public final class AppNavigation {
         }
 
         next.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        next.setSize(1180, 900);
-        next.setLocationRelativeTo(null);
+
+        // Preserve size, position, and maximized state from current frame
+        if (current != null) {
+            Rectangle bounds = current.getBounds();
+            int extendedState = current.getExtendedState();
+            next.setBounds(bounds);
+            next.setExtendedState(extendedState);
+        } else {
+            next.setSize(1180, 900);
+            next.setLocationRelativeTo(null);
+        }
+
         next.setVisible(true);
 
         if (current != null) {
