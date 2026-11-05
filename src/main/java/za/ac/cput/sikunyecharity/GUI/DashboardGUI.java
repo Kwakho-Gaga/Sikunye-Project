@@ -975,13 +975,6 @@ private JPanel createNavigationBar() {
     }
 
     private void showLoginDialog() {
-        if (requestAdminAccess(this)) {
-            DonationGUI donationGUI = new DonationGUI();
-            donationGUI.setVisible(true);
-        }
-    }
-
-    public static boolean requestAdminAccess(Component parent) {
 
         JTextField usernameField
                 = new JTextField();
@@ -998,7 +991,7 @@ private JPanel createNavigationBar() {
 
         int option
                 = JOptionPane.showConfirmDialog(
-                        parent,
+                        this,
                         fields,
                         "Administrator Login",
                         JOptionPane.OK_CANCEL_OPTION,
@@ -1006,7 +999,7 @@ private JPanel createNavigationBar() {
                 );
 
         if (option != JOptionPane.OK_OPTION) {
-            return false;
+            return;
         }
 
         String username
@@ -1023,36 +1016,38 @@ private JPanel createNavigationBar() {
                 || password.isEmpty()) {
 
             JOptionPane.showMessageDialog(
-                    parent,
+                    this,
                     "Please enter your username and password.",
                     "Login Error",
                     JOptionPane.WARNING_MESSAGE
             );
 
-            return false;
+            return;
         }
         if (username.equals(ADMIN_USERNAME)
                 && password.equals(ADMIN_PASSWORD)) {
 
             JOptionPane.showMessageDialog(
-                    parent,
+                    this,
                     "Login successful!",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );
 
-            return true;
+            DonationGUI donationGUI
+                    = new DonationGUI();
+
+            donationGUI.setVisible(true);
 
         } else {
 
             JOptionPane.showMessageDialog(
-                    parent,
+                    this,
                     "Invalid username or password.",
                     "Login Failed",
                     JOptionPane.ERROR_MESSAGE
             );
         }
-        return false;
     }
 
     private void showDonationDetails(int row) {
