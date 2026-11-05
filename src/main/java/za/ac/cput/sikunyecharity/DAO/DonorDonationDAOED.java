@@ -2,7 +2,6 @@ package za.ac.cput.sikunyecharity.DAO;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.DBConection.DBConnection;
 
 /**
  * Esona Dyomfana 240949072
@@ -38,10 +38,7 @@ public class DonorDonationDAOED {
     }
 
 
-    private static final String DB_URL = "jdbc:derby://localhost:1527/SikunyeDB";
-    private static final String DB_USER = "sikunye_use";
-    private static final String DB_PASSWORD = "iWashere@12";
-    private static final String DB_SCHEMA = DB_USER.toUpperCase(Locale.ROOT);
+    private static final String DB_SCHEMA = "ADMINISTRATOR";
 
     private static final String CREATE_PROJECT_TABLE =
             "CREATE TABLE ProjectTable ("
@@ -257,7 +254,7 @@ public class DonorDonationDAOED {
     }
 
     private Connection openConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        return DBConnection.derbyConnection();
     }
 
     private int nextId(Connection connection, String table, String idColumn)
