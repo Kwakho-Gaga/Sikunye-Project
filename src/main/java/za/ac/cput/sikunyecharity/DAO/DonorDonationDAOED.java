@@ -38,17 +38,6 @@ public class DonorDonationDAOED {
 
     private static final String DB_SCHEMA = "ADMINISTRATOR";
 
-    private static final String CREATE_PROJECT_TABLE =
-            "CREATE TABLE ProjectTable ("
-            + "ProjectID VARCHAR(20) PRIMARY KEY, "
-            + "Name VARCHAR(120) NOT NULL, "
-            + "OwnerName VARCHAR(120), "
-            + "Description VARCHAR(2000), "
-            + "Status VARCHAR(40), "
-            + "StartDate DATE, "
-            + "EndDate DATE, "
-            + "GoalAmount DECIMAL(12,2))";
-
     private static final String CREATE_DONOR_TABLE =
             "CREATE TABLE DONOR ("
             + "DONORID INT NOT NULL PRIMARY KEY, "
@@ -89,7 +78,6 @@ public class DonorDonationDAOED {
         List<Project> projects = new ArrayList<>();
         String sql = "SELECT ProjectID, Name FROM ProjectTable ORDER BY Name";
         try (Connection connection = openConnection()) {
-            ensureProjectTable(connection);
             try (PreparedStatement statement = connection.prepareStatement(sql);
                     ResultSet rows = statement.executeQuery()) {
                 while (rows.next()) {
@@ -103,48 +91,6 @@ public class DonorDonationDAOED {
         return projects;
     }
 
-    private void ensureProjectTable(Connection connection) throws SQLException {
-        createTableIfMissing(connection, "PROJECTTABLE", CREATE_PROJECT_TABLE);
-
-        try (PreparedStatement countStatement = connection.prepareStatement(
-                "SELECT COUNT(*) FROM ProjectTable");
-                ResultSet result = countStatement.executeQuery()) {
-            result.next();
-            if (result.getInt(1) != 0) {
-                return;
-            }
-        }
-
-        String insertSql = "INSERT INTO ProjectTable "
-                + "(ProjectID, Name, OwnerName, Description, Status, StartDate, EndDate, GoalAmount) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(insertSql)) {
-            addProject(statement, "SSD", "School Supply Drive", "Mr Gime",
-                    "Providing essential school supplies to help students in need achieve their academic goals.",
-                    "In progress", "2020-12-20", "2027-01-20");
-            addProject(statement, "SSF", "Share and Serve Food", "Mr Gime",
-                    "Providing meals to underserved families and helping to fight hunger.",
-                    "In progress", "2024-01-20", "2029-01-08");
-            addProject(statement, "CCC", "Community Care Connect", "Mr Gime",
-                    "Providing accessible healthcare services and resources to underserved communities.",
-                    "Planned", "2026-07-02", "2028-01-10");
-        }
-    }
-
-    private void addProject(PreparedStatement statement, String projectId, String name,
-            String owner, String description, String status, String startDate, String endDate)
-            throws SQLException {
-        statement.setString(1, projectId);
-        statement.setString(2, name);
-        statement.setString(3, owner);
-        statement.setString(4, description);
-        statement.setString(5, status);
-        statement.setDate(6, java.sql.Date.valueOf(startDate));
-        statement.setDate(7, java.sql.Date.valueOf(endDate));
-        statement.setNull(8, Types.DECIMAL);
-        statement.executeUpdate();
-    }
-
     public void createTablesIfNotExist() throws SQLException {
         try (Connection connection = openConnection()) {
             createTablesIfMissing(connection);
@@ -152,7 +98,6 @@ public class DonorDonationDAOED {
     }
 
     private void createTablesIfMissing(Connection connection) throws SQLException {
-        ensureProjectTable(connection);
         createTableIfMissing(connection, "DONOR", CREATE_DONOR_TABLE);
         createTableIfMissing(connection, "DONATION", CREATE_DONATION_TABLE);
         ensureDonationProjectColumn(connection);
