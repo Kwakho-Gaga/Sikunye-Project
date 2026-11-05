@@ -51,31 +51,54 @@ public final class AppNavigation {
         if (destination == null) return;
 
         JFrame next;
-        switch (destination) {
-            case "Home":
+        String route = destination.trim().toLowerCase();
+
+        switch (route) {
+            case "home":
                 HomeGUI home = new HomeGUI();
                 home.setGui();
                 next = home;
                 break;
-            case "Projects":
+
+            case "projects":
                 next = new ProjectsPage();
                 break;
-            case "Beneficiaries":
+
+            case "beneficiaries":
                 next = new BeneficiariesMenu();
                 break;
-            case "Contact":
+
+            case "contact":
                 ContactGUI contact = new ContactGUI();
                 contact.setGUI();
                 next = contact;
                 break;
-            case "Feedback":
+
+            case "feedback":
                 FeedbackGUI feedback = new FeedbackGUI(current);
                 feedback.setVisible(true);
-                return;
-                //break;
-            case "Items Donated":
-            case "ItemsDonated":
-            case "Inventory":
+                return; // Modal popup, retain active frame
+
+            case "donor":
+            case "donate":
+            case "donation":
+            case "donations":
+                DonationED donation = new DonationED();
+//                try {
+//                    donation.setGui();
+//                } catch (NoSuchMethodError | Exception e) {
+//                    try {
+//                        donation.setGUI();
+//                    } catch (Exception ignored) {
+//                    }
+//                }
+                next = donation;
+                break;
+
+            case "items donated":
+            case "itemsdonated":
+            case "item donated":
+            case "inventory":
                 JFrame itemFrame = new JFrame("Sikunye Charity - Item Inventory & Distribution");
                 itemFrame.setLayout(new java.awt.BorderLayout());
                 itemFrame.add(new HeaderPanel(itemFrame, "Items Donated"), java.awt.BorderLayout.NORTH);
@@ -83,6 +106,7 @@ public final class AppNavigation {
                 itemFrame.add(new FooterPanel(itemFrame), java.awt.BorderLayout.SOUTH);
                 next = itemFrame;
                 break;
+
             default:
                 return;
         }
@@ -109,12 +133,18 @@ public final class AppNavigation {
 
     private static boolean isMatchingPage(String className, String destination) {
         if (className == null || destination == null) return false;
-        if (className.equalsIgnoreCase("HomeGUI") && destination.equalsIgnoreCase("Home")) return true;
-        if (className.equalsIgnoreCase("ProjectsPage") && destination.equalsIgnoreCase("Projects")) return true;
-        if (className.equalsIgnoreCase("BeneficiariesMenu") && destination.equalsIgnoreCase("Beneficiaries")) return true;
-        if (className.equalsIgnoreCase("ContactGUI") && destination.equalsIgnoreCase("Contact")) return true;
-        if (className.equalsIgnoreCase("FeedbackGUI") && destination.equalsIgnoreCase("Feedback")) return true;
-        if (destination.toLowerCase().contains("item") && className.toLowerCase().contains("item")) return true;
+
+        String c = className.toLowerCase();
+        String d = destination.toLowerCase();
+
+        if (c.contains("home") && d.contains("home")) return true;
+        if (c.contains("project") && d.contains("project")) return true;
+        if (c.contains("beneficiar") && d.contains("beneficiar")) return true;
+        if (c.contains("contact") && d.contains("contact")) return true;
+        if (c.contains("feedback") && d.contains("feedback")) return true;
+        if ((c.contains("donation") || c.contains("donor")) && (d.contains("donat") || d.contains("donor"))) return true;
+        if (c.contains("item") && d.contains("item")) return true;
+
         return false;
     }
 }

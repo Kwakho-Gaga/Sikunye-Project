@@ -121,7 +121,7 @@ public class HomeGUI extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
-            AppNavigation.open(this, "Items Donated");
+            AppNavigation.open(this, "donation");
         }
     }
 

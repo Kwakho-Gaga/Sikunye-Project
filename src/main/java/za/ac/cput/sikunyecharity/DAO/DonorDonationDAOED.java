@@ -10,13 +10,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import za.ac.cput.sikunyecharity.Domain.Project;
 import za.ac.cput.sikunyecharity.DBConection.DBConnection;
+import za.ac.cput.sikunyecharity.Domain.Project;
 
 /**
  * Esona Dyomfana 240949072
  */
-
 public class DonorDonationDAOED {
 
     public static final class DonationLink {
@@ -36,7 +35,6 @@ public class DonorDonationDAOED {
             return projectId;
         }
     }
-
 
     private static final String DB_SCHEMA = "ADMINISTRATOR";
 

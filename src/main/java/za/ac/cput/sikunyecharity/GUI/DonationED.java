@@ -1,4 +1,4 @@
-package za.ac.cput.sikunyecharity;
+package za.ac.cput.sikunyecharity.GUI;
 
 import javax.swing.SwingUtilities;
 import za.ac.cput.sikunyecharity.GUI.DonorDonationGUI_ED;
