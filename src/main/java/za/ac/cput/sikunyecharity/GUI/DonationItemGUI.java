@@ -1,4 +1,3 @@
-
 package za.ac.cput.sikunyecharity.GUI;
 
 import za.ac.cput.sikunyecharity.DAO.DonationItemDAO;
@@ -34,7 +33,6 @@ public class DonationItemGUI extends JPanel {
     private Runnable backAction;
 
     // -------------------- CONSTRUCTORS --------------------
-
     public DonationItemGUI() {
         this(0, null);
     }
@@ -62,7 +60,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- CREATE GUI --------------------
-
     private void createGUI() {
 
         JLabel titleLabel = new JLabel(
@@ -79,7 +76,6 @@ public class DonationItemGUI extends JPanel {
         add(titleLabel, BorderLayout.NORTH);
 
         // -------------------- FORM PANEL --------------------
-
         JPanel formPanel = new JPanel(new GridBagLayout());
 
         formPanel.setBackground(Color.WHITE);
@@ -137,7 +133,6 @@ public class DonationItemGUI extends JPanel {
         addFormComponent(formPanel, gbc, 4, conditionField);
 
         // -------------------- BUTTONS --------------------
-
         JPanel formButtonPanel = new JPanel(
                 new GridLayout(2, 2, 8, 8)
         );
@@ -162,7 +157,6 @@ public class DonationItemGUI extends JPanel {
         formPanel.add(formButtonPanel, gbc);
 
         // -------------------- BACK BUTTON --------------------
-
         JPanel backButtonPanel = new JPanel(
                 new FlowLayout(FlowLayout.LEFT)
         );
@@ -181,7 +175,6 @@ public class DonationItemGUI extends JPanel {
         add(formPanel, BorderLayout.WEST);
 
         // -------------------- DONATED ITEMS TABLE --------------------
-
         String[] columns = {
             "DONATION ITEM ID",
             "DONATION ID",
@@ -218,7 +211,6 @@ public class DonationItemGUI extends JPanel {
         add(tableScrollPane, BorderLayout.CENTER);
 
         // -------------------- BUTTON ACTIONS --------------------
-
         addButton.addActionListener(e -> addDonationItem());
 
         updateButton.addActionListener(e -> updateDonationItem());
@@ -231,7 +223,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- FORM FIELD HELPERS --------------------
-
     private void addFormField(
             JPanel panel,
             GridBagConstraints gbc,
@@ -261,7 +252,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- SET DONATION ID --------------------
-
     public void setDonationID(int donationID) {
 
         donationIDField.setText(String.valueOf(donationID));
@@ -271,7 +261,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- BACK NAVIGATION --------------------
-
     private void goBack() {
 
         if (backAction != null) {
@@ -290,8 +279,8 @@ public class DonationItemGUI extends JPanel {
             frame.setContentPane(new DonationGUI());
             frame.setVisible(true);
 
-            Window currentWindow =
-                    SwingUtilities.getWindowAncestor(this);
+            Window currentWindow
+                    = SwingUtilities.getWindowAncestor(this);
 
             if (currentWindow != null) {
                 currentWindow.dispose();
@@ -300,7 +289,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- LOAD NEXT DONATION ITEM ID --------------------
-
     private void loadNextDonationItemID() {
 
         try {
@@ -324,7 +312,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- LOAD DONATION ITEMS --------------------
-
     private void loadDonationItems() {
 
         model.setRowCount(0);
@@ -359,7 +346,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- ADD DONATION ITEM --------------------
-
     private void addDonationItem() {
 
         try {
@@ -368,8 +354,8 @@ public class DonationItemGUI extends JPanel {
             String itemText = itemIDField.getText().trim();
             String quantityText = quantityField.getText().trim();
 
-            String condition =
-                    conditionField.getText().trim().toUpperCase();
+            String condition
+                    = conditionField.getText().trim().toUpperCase();
 
             // Validate empty fields.
             if (donationText.isEmpty()
@@ -493,7 +479,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- UPDATE DONATION ITEM --------------------
-
     private void updateDonationItem() {
 
         int selectedRow = itemTable.getSelectedRow();
@@ -508,8 +493,8 @@ public class DonationItemGUI extends JPanel {
             return;
         }
 
-        int modelRow =
-                itemTable.convertRowIndexToModel(selectedRow);
+        int modelRow
+                = itemTable.convertRowIndexToModel(selectedRow);
 
         int donationItemID = Integer.parseInt(
                 model.getValueAt(modelRow, 0).toString()
@@ -556,7 +541,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- DELETE DONATION ITEM --------------------
-
     private void deleteDonationItem() {
 
         int selectedRow = itemTable.getSelectedRow();
@@ -571,8 +555,8 @@ public class DonationItemGUI extends JPanel {
             return;
         }
 
-        int modelRow =
-                itemTable.convertRowIndexToModel(selectedRow);
+        int modelRow
+                = itemTable.convertRowIndexToModel(selectedRow);
 
         int donationItemID = Integer.parseInt(
                 model.getValueAt(modelRow, 0).toString()
@@ -615,7 +599,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- CLEAR FORM --------------------
-
     private void clearForm() {
 
         itemIDField.setText("");
@@ -629,7 +612,6 @@ public class DonationItemGUI extends JPanel {
     }
 
     // -------------------- STANDALONE TESTING --------------------
-
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
