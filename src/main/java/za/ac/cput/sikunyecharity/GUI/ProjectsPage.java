@@ -187,12 +187,6 @@ public class ProjectsPage extends JFrame implements ActionListener {
                     field.setForeground(TEXT);
                 }
             }
-            @Override public void focusLost(FocusEvent e) {
-                if (field.getText().trim().isEmpty()) {
-                    field.setText("search projects");
-                    field.setForeground(new Color(205, 205, 205));
-                }
-            }
         });
         JLabel icon = new JLabel("\u2315");
         icon.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -259,7 +253,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
         int imageNumber = imageNumber(project.getProjectId());
         JPanel column = new JPanel();
         column.setOpaque(false);
-        column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
+        column.setLayout(new BorderLayout(0, 10));
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -309,12 +303,13 @@ public class ProjectsPage extends JFrame implements ActionListener {
         progressRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 16));
         card.add(progressRow);
 
-        column.add(card);
-        column.add(Box.createVerticalStrut(10));
+        column.add(card, BorderLayout.CENTER);
         JButton btnViewProject = new FlatButton("View project  \u279C", 105, 25, 18);
-        btnViewProject.setAlignmentX(Component.LEFT_ALIGNMENT);
         btnViewProject.addActionListener(e -> openProject(project));
-        column.add(btnViewProject);
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        buttonRow.setOpaque(false);
+        buttonRow.add(btnViewProject);
+        column.add(buttonRow, BorderLayout.SOUTH);
         return column;
     }
 

@@ -91,6 +91,18 @@ public class ProjectDAO {
         }
     }
 
+    public void unarchiveProject(String projectId, String status) throws SQLException {
+        try (Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(
+                        "UPDATE ProjectTable SET Status = ? WHERE ProjectID = ? AND UPPER(Status) = 'ARCHIVED'")) {
+            statement.setString(1, status);
+            statement.setString(2, projectId);
+            if (statement.executeUpdate() == 0) {
+                throw new SQLException("Archived project not found: " + projectId);
+            }
+        }
+    }
+
     private void setProjectFields(PreparedStatement statement, Project project)
             throws SQLException {
         statement.setString(1, project.getProjectId());

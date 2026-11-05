@@ -5,6 +5,8 @@
 package za.ac.cput.sikunyecharity.GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +28,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -71,6 +74,7 @@ public class ProjecTable extends JFrame implements ActionListener {
     private JButton btnAddProject;
     private JButton btnUpdateProject;
     private JButton btnArchiveProject;
+    private JButton btnUnarchiveProject;
     private JButton btnClear;
     private JButton btnRefresh;
     private JButton btnBack;
@@ -84,14 +88,6 @@ public class ProjecTable extends JFrame implements ActionListener {
         this.projectsPage = projectsPage;
 
         setTitle("Sikunye Charity - Project Donations");
-
-        setSize(1200, 700);
-
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        setLocationRelativeTo(null);
-
-        setLayout(new BorderLayout(10, 10));
 
         createInterface();
 
@@ -112,58 +108,64 @@ public class ProjecTable extends JFrame implements ActionListener {
     private void createInterface() {
 
         // Top form
-        JPanel formPanel
-                = new JPanel(new GridLayout(1, 2, 20, 5));
+        JPanel content = new JPanel(new BorderLayout(0, 18));
+        content.setBorder(new EmptyBorder(25, 35, 25, 35));
+        JPanel top = new JPanel(new BorderLayout(0, 15));
+        top.setOpaque(false);
+        JPanel formPanel = new JPanel(new GridLayout(1, 2, 18, 9));
+        formPanel.setOpaque(false);
 
         // Left panel - labels
         JPanel labelPanel
-                = new JPanel(new GridLayout(11, 1, 5, 5));
+                = new JPanel(new GridLayout(11, 1, 9, 9));
+        labelPanel.setOpaque(false);
 
         labelPanel.add(
-                new JLabel("Project ID:")
+                BeneficiaryPageStyle.label("Project ID:")
         );
 
         labelPanel.add(
-                new JLabel("Project Name:")
+                BeneficiaryPageStyle.label("Project Name:")
         );
 
         labelPanel.add(
-                new JLabel("Owner Name:")
+                BeneficiaryPageStyle.label("Owner Name:")
         );
 
         labelPanel.add(
-                new JLabel("Description:")
+                BeneficiaryPageStyle.label("Description:")
         );
 
         labelPanel.add(
-                new JLabel("Status:")
+                BeneficiaryPageStyle.label("Status:")
         );
 
         labelPanel.add(
-                new JLabel("Start Date:")
+                BeneficiaryPageStyle.label("Start Date:")
         );
 
         labelPanel.add(
-                new JLabel("End Date:")
+                BeneficiaryPageStyle.label("End Date:")
         );
 
         labelPanel.add(
-                new JLabel("Goal Amount:")
+                BeneficiaryPageStyle.label("Goal Amount:")
         );
 
-        labelPanel.add(new JLabel("Progress (%):"));
+        labelPanel.add(BeneficiaryPageStyle.label("Progress (%):"));
 
         labelPanel.add(
-                new JLabel("User Name:")
+                BeneficiaryPageStyle.label("User Name:")
         );
 
         labelPanel.add(
-                new JLabel("User Email:")
+                BeneficiaryPageStyle.label("User Email:")
         );
 
         // Right panel - textfields
         JPanel fieldPanel
-                = new JPanel(new GridLayout(11, 1, 5, 5));
+                = new JPanel(new GridLayout(11, 1, 9, 9));
+        fieldPanel.setOpaque(false);
 
         txtProjectID
                 = new JTextField();
@@ -215,14 +217,11 @@ public class ProjecTable extends JFrame implements ActionListener {
         formPanel.add(labelPanel);
         formPanel.add(fieldPanel);
 
-        add(
-                formPanel,
-                BorderLayout.NORTH
-        );
+        top.add(formPanel, BorderLayout.CENTER);
 
         // Button panel
-        JPanel buttonPanel
-                = new JPanel();
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.setOpaque(false);
 
         btnRegister
                 = new JButton("Register");
@@ -230,6 +229,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         btnAddProject = new JButton("Add Project");
         btnUpdateProject = new JButton("Update Project");
         btnArchiveProject = new JButton("Archive Project");
+        btnUnarchiveProject = new JButton("Unarchive Project");
 
         btnClear
                 = new JButton("Clear");
@@ -244,9 +244,19 @@ public class ProjecTable extends JFrame implements ActionListener {
         buttonPanel.add(btnAddProject);
         buttonPanel.add(btnUpdateProject);
         buttonPanel.add(btnArchiveProject);
+        buttonPanel.add(btnUnarchiveProject);
         buttonPanel.add(btnClear);
         buttonPanel.add(btnRefresh);
-        buttonPanel.add(btnBack);
+        BeneficiaryPageStyle.styleButton(btnRegister, BeneficiaryPageStyle.DARK);
+        BeneficiaryPageStyle.styleButton(btnAddProject, new Color(39, 189, 114));
+        BeneficiaryPageStyle.styleButton(btnUpdateProject, new Color(207, 160, 18));
+        BeneficiaryPageStyle.styleButton(btnArchiveProject, new Color(208, 80, 75));
+        BeneficiaryPageStyle.styleButton(btnUnarchiveProject, new Color(31, 151, 204));
+        BeneficiaryPageStyle.styleButton(btnClear, new Color(112, 126, 136));
+        BeneficiaryPageStyle.styleButton(btnRefresh, new Color(31, 151, 204));
+        BeneficiaryPageStyle.styleButton(btnBack, BeneficiaryPageStyle.DARK);
+        top.add(buttonPanel, BorderLayout.SOUTH);
+        content.add(top, BorderLayout.NORTH);
 
         // Table
         String[] columns = {
@@ -274,9 +284,14 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         tblProjects
                 = new JTable(projectTableModel);
+        tblProjects.setRowHeight(28);
+        tblProjects.setAutoCreateRowSorter(true);
 
         JScrollPane scrollPane
                 = new JScrollPane(tblProjects);
+        JPanel projectPanel = new JPanel(new BorderLayout());
+        projectPanel.add(BeneficiaryPageStyle.label("Projects (including archived)"), BorderLayout.NORTH);
+        projectPanel.add(scrollPane, BorderLayout.CENTER);
 
         String[] donationColumns = {
             "Donation ID", "Donor ID", "Project ID", "Amount (R)",
@@ -289,40 +304,30 @@ public class ProjecTable extends JFrame implements ActionListener {
             }
         };
         tblDonations = new JTable(donationTableModel);
+        tblDonations.setRowHeight(28);
+        tblDonations.setAutoCreateRowSorter(true);
         JPanel donationPanel = new JPanel(new BorderLayout());
-        donationPanel.add(new JLabel("Donations (select a project to filter)"), BorderLayout.NORTH);
+        donationPanel.add(BeneficiaryPageStyle.label("Donations (select a project to filter)"), BorderLayout.NORTH);
         donationPanel.add(new JScrollPane(tblDonations), BorderLayout.CENTER);
 
         JSplitPane tables = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                scrollPane, donationPanel);
+                projectPanel, donationPanel);
         tables.setResizeWeight(0.45);
 
-        // Bottom
-        JPanel bottomPanel
-                = new JPanel(new BorderLayout());
-
-        // Buttons ABOVE JTable
-        bottomPanel.add(
-                buttonPanel,
-                BorderLayout.NORTH
-        );
-
-        // Project and donation tables below buttons
-        bottomPanel.add(
-                tables,
-                BorderLayout.CENTER
-        );
-
-        add(
-                bottomPanel,
-                BorderLayout.CENTER
-        );
+        content.add(tables, BorderLayout.CENTER);
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        bottom.setOpaque(false);
+        bottom.add(btnBack);
+        content.add(bottom, BorderLayout.SOUTH);
+        BeneficiaryPageStyle.setup(this, "Manage Projects",
+                "Add projects, review donations, and maintain their records.", content);
 
         // Events
         btnRegister.addActionListener(this);
         btnAddProject.addActionListener(this);
         btnUpdateProject.addActionListener(this);
         btnArchiveProject.addActionListener(this);
+        btnUnarchiveProject.addActionListener(this);
 
         btnClear.addActionListener(this);
 
@@ -353,6 +358,8 @@ public class ProjecTable extends JFrame implements ActionListener {
             updateProject();
         } else if (source == btnArchiveProject) {
             archiveProject();
+        } else if (source == btnUnarchiveProject) {
+            unarchiveProject();
         } else if (source == btnClear) {
             clearFields();
         } else if (source == btnRefresh) {
@@ -390,7 +397,8 @@ public class ProjecTable extends JFrame implements ActionListener {
             if (projectId != null) {
                 for (int row = 0; row < projectTableModel.getRowCount(); row++) {
                     if (projectId.equals(cellText(row, 0))) {
-                        tblProjects.setRowSelectionInterval(row, row);
+                        int viewRow = tblProjects.convertRowIndexToView(row);
+                        tblProjects.setRowSelectionInterval(viewRow, viewRow);
                         break;
                     }
                 }
@@ -409,13 +417,13 @@ public class ProjecTable extends JFrame implements ActionListener {
     // Select project from jtable
     private void loadSelectedProject() {
 
-        int row
-                = tblProjects.getSelectedRow();
+        int row = tblProjects.getSelectedRow();
 
         if (row == -1) {
 
             return;
         }
+        row = tblProjects.convertRowIndexToModel(row);
 
         txtProjectID.setText(cellText(row, 0));
 
@@ -604,10 +612,42 @@ public class ProjecTable extends JFrame implements ActionListener {
         }
     }
 
+    private void unarchiveProject() {
+        String id = selectedProjectId();
+        if (id == null) {
+            JOptionPane.showMessageDialog(this, "Select an archived project to unarchive.");
+            return;
+        }
+        int row = tblProjects.convertRowIndexToModel(tblProjects.getSelectedRow());
+        if (!"Archived".equalsIgnoreCase(cellText(row, 4))) {
+            JOptionPane.showMessageDialog(this, "This project is not archived.");
+            return;
+        }
+        String status = JOptionPane.showInputDialog(this,
+                "Status after unarchiving:", "In progress");
+        if (status == null) {
+            return;
+        }
+        status = status.trim();
+        if (status.isEmpty() || status.length() > 40
+                || "Archived".equalsIgnoreCase(status)) {
+            JOptionPane.showMessageDialog(this, "Enter a status other than Archived (up to 40 characters).");
+            return;
+        }
+        try {
+            projectDAO.unarchiveProject(id, status);
+            loadProjects();
+            JOptionPane.showMessageDialog(this, "Project unarchived.");
+        } catch (java.sql.SQLException exception) {
+            JOptionPane.showMessageDialog(this, "Could not unarchive project:\n" + exception.getMessage());
+        }
+    }
+
     private void selectProject(String id) {
         for (int row = 0; row < projectTableModel.getRowCount(); row++) {
             if (id.equals(cellText(row, 0))) {
-                tblProjects.setRowSelectionInterval(row, row);
+                int viewRow = tblProjects.convertRowIndexToView(row);
+                tblProjects.setRowSelectionInterval(viewRow, viewRow);
                 return;
             }
         }
