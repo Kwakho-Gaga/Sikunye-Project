@@ -8,9 +8,19 @@ import java.awt.event.FocusEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import za.ac.cput.sikunyecharity.DAO.ProjectDAO;
+import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.Domain.ProjectDefaults;
 
 public class ProjectsPage extends JFrame implements ActionListener {
 
@@ -18,15 +28,22 @@ public class ProjectsPage extends JFrame implements ActionListener {
     private static final Color HERO_BLUE = new Color(111, 204, 229);
     private static final Color PAGE_BACKGROUND = new Color(248, 244, 250);
     private static final Color TEXT = new Color(24, 24, 24);
+    private static final DateTimeFormatter DATE_FORMAT =
+            DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
     private BufferedImage referenceImage;
-    private JButton btnSchoolProject;
-    private JButton btnFoodProject;
-    private JButton btnCareProject;
+    private final ProjectDAO projectDAO = new ProjectDAO();
+    private List<Project> projects = new ArrayList<>();
+    private String loadError;
+    private JPanel projectsSection;
+    private JPanel cardsPanel;
+    private JTextField searchField;
     private JButton btnBack;
+    private JButton btnManageDonations;
 
     public ProjectsPage() {
         super("Sikunye Charity - Projects");
         loadReferenceImage();
+        loadProjects();
 
         JPanel page = new PagePanel();
         page.setLayout(new BoxLayout(page, BoxLayout.Y_AXIS));
@@ -112,12 +129,10 @@ public class ProjectsPage extends JFrame implements ActionListener {
 
     private JPanel createProjectsSection() {
         JPanel section = new JPanel();
+        projectsSection = section;
         section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
         section.setBackground(PAGE_BACKGROUND);
         section.setBorder(new EmptyBorder(13, 30, 25, 30));
-        section.setPreferredSize(new Dimension(1180, 535));
-        section.setMinimumSize(new Dimension(900, 535));
-        section.setMaximumSize(new Dimension(Integer.MAX_VALUE, 535));
 
         JPanel toolbar = new JPanel(new BorderLayout());
         toolbar.setOpaque(false);
@@ -129,19 +144,9 @@ public class ProjectsPage extends JFrame implements ActionListener {
         section.add(toolbar);
         section.add(Box.createVerticalStrut(9));
 
-        JPanel cards = new JPanel(new GridLayout(1, 3, 54, 0));
-        cards.setOpaque(false);
-        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 380));
-        cards.add(createProjectColumn("School Supply Drive", 0,
-                "Providing essential school supplies to help students in need achieve their academic goals.",
-                "20 December 2020-20 January 2027", "Mr Gime", "In progress", 58));
-        cards.add(createProjectColumn("Share and Serve Food", 1,
-                "Provides underserved families with meals, helping to fight hunger and build stronger communities.",
-                "20 January 2024-08 January 2029", "Mr Gime", "In Progress", 44));
-        cards.add(createProjectColumn("Community Care Connect", 2,
-                "A community-led initiative to provide accessible healthcare services and resources to vulnerable populations, bridging the gap in healthcare for underserved communities.",
-                "02 July 2026-10 January 2028", "Mr Gime", "Planned", 36));
-        section.add(cards);
+        cardsPanel = new JPanel(new GridLayout(0, 3, 54, 22));
+        cardsPanel.setOpaque(false);
+        section.add(cardsPanel);
         section.add(Box.createVerticalStrut(22));
 
         JPanel backRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -150,7 +155,13 @@ public class ProjectsPage extends JFrame implements ActionListener {
         btnBack.setFont(new Font("SansSerif", Font.PLAIN, 16));
         btnBack.addActionListener(this);
         backRow.add(btnBack);
+        backRow.add(Box.createHorizontalStrut(16));
+        btnManageDonations = new FlatButton("Manage project donations", 220, 36, 0);
+        btnManageDonations.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        btnManageDonations.addActionListener(this);
+        backRow.add(btnManageDonations);
         section.add(backRow);
+        showProjects();
         return section;
     }
 
@@ -160,21 +171,21 @@ public class ProjectsPage extends JFrame implements ActionListener {
         search.setBorder(new EmptyBorder(4, 15, 4, 12));
         search.setPreferredSize(new Dimension(250, 30));
         JTextField field = new JTextField("search projects");
+        searchField = field;
         field.setFont(new Font("SansSerif", Font.PLAIN, 12));
         field.setForeground(new Color(205, 205, 205));
         field.setBorder(null);
         field.setOpaque(false);
+        field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void insertUpdate(DocumentEvent e) { showProjects(); }
+            @Override public void removeUpdate(DocumentEvent e) { showProjects(); }
+            @Override public void changedUpdate(DocumentEvent e) { showProjects(); }
+        });
         field.addFocusListener(new FocusAdapter() {
             @Override public void focusGained(FocusEvent e) {
                 if ("search projects".equals(field.getText())) {
                     field.setText("");
                     field.setForeground(TEXT);
-                }
-            }
-            @Override public void focusLost(FocusEvent e) {
-                if (field.getText().trim().isEmpty()) {
-                    field.setText("search projects");
-                    field.setForeground(new Color(205, 205, 205));
                 }
             }
         });
@@ -185,11 +196,68 @@ public class ProjectsPage extends JFrame implements ActionListener {
         return search;
     }
 
-    private JPanel createProjectColumn(String title, int imageNumber, String description,
-            String timeline, String owner, String status, int progress) {
+    private void loadProjects() {
+        projects = new ArrayList<>(ProjectDefaults.all());
+        try {
+            for (Project project : projectDAO.getVisibleProjects()) {
+                if (!ProjectDefaults.isDefault(project.getProjectId())) {
+                    projects.add(project);
+                }
+            }
+            loadError = null;
+        } catch (SQLException exception) {
+            loadError = exception.getMessage();
+        }
+    }
+
+    public void refreshProjects() {
+        loadProjects();
+        showProjects();
+    }
+
+    private void showProjects() {
+        if (cardsPanel == null) {
+            return;
+        }
+        cardsPanel.removeAll();
+        String query = searchField == null ? "" : searchField.getText().trim();
+        if ("search projects".equalsIgnoreCase(query)) {
+            query = "";
+        }
+        int count = 0;
+        for (Project project : projects) {
+            if (project.getName().toLowerCase(Locale.ROOT)
+                    .contains(query.toLowerCase(Locale.ROOT))) {
+                cardsPanel.add(createProjectColumn(project));
+                count++;
+            }
+        }
+        if (count == 0) {
+            cardsPanel.add(new JLabel("No projects found."));
+        }
+        int rows = Math.max(1, (count + 2) / 3);
+        int cardHeight = rows * 380 + (rows - 1) * 22;
+        cardsPanel.setPreferredSize(new Dimension(1120, cardHeight));
+        cardsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, cardHeight));
+        int sectionHeight = 155 + cardHeight;
+        projectsSection.setPreferredSize(new Dimension(1180, sectionHeight));
+        projectsSection.setMinimumSize(new Dimension(900, sectionHeight));
+        projectsSection.setMaximumSize(new Dimension(Integer.MAX_VALUE, sectionHeight));
+        projectsSection.revalidate();
+        projectsSection.repaint();
+    }
+
+    private JPanel createProjectColumn(Project project) {
+        String title = project.getName();
+        String description = project.getDescription() == null ? "" : project.getDescription();
+        String timeline = formatDate(project.getStartDate()) + "-" + formatDate(project.getEndDate());
+        String owner = project.getOwnerName() == null ? "" : project.getOwnerName();
+        String status = project.getStatus() == null ? "" : project.getStatus();
+        int progress = project.getProgressPercent();
+        int imageNumber = imageNumber(project.getProjectId());
         JPanel column = new JPanel();
         column.setOpaque(false);
-        column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
+        column.setLayout(new BorderLayout(0, 10));
         JPanel card = new JPanel();
         card.setBackground(Color.WHITE);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -239,19 +307,13 @@ public class ProjectsPage extends JFrame implements ActionListener {
         progressRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 16));
         card.add(progressRow);
 
-        column.add(card);
-        column.add(Box.createVerticalStrut(10));
+        column.add(card, BorderLayout.CENTER);
         JButton btnViewProject = new FlatButton("View project  \u279C", 105, 25, 18);
-        btnViewProject.setAlignmentX(Component.LEFT_ALIGNMENT);
-        btnViewProject.addActionListener(this);
-        if (imageNumber == 0) {
-            btnSchoolProject = btnViewProject;
-        } else if (imageNumber == 1) {
-            btnFoodProject = btnViewProject;
-        } else {
-            btnCareProject = btnViewProject;
-        }
-        column.add(btnViewProject);
+        btnViewProject.addActionListener(e -> openProject(project));
+        JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        buttonRow.setOpaque(false);
+        buttonRow.add(btnViewProject);
+        column.add(buttonRow, BorderLayout.SOUTH);
         return column;
     }
 
@@ -259,31 +321,29 @@ public class ProjectsPage extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
 
-        if (source == btnSchoolProject) {
-            openProject(0);
-        } else if (source == btnFoodProject) {
-            openProject(1);
-        } else if (source == btnCareProject) {
-            openProject(2);
-        } else if (source == btnBack) {
+        if (source == btnBack) {
             AppNavigation.open(this, "Home");
+        } else if (source == btnManageDonations && ProjectAdminLogin.requestAccess(this)) {
+            ProjecTable table = new ProjecTable(this);
+            setVisible(false);
+            table.setVisible(true);
         }
     }
 
-    private void openProject(int projectNumber) {
+    private void openProject(Project project) {
         JFrame detailPage;
-        switch (projectNumber) {
-            case 0:
+        switch (project.getProjectId()) {
+            case "SSD":
                 detailPage = new SchoolSupplyDrive(this);
                 break;
-            case 1:
+            case "SSF":
                 detailPage = new ShareAndServeFood(this);
                 break;
-            case 2:
+            case "CCC":
                 detailPage = new CommunityCareConnect(this);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown project: " + projectNumber);
+                detailPage = new ProjectDetailsPage(project, this);
         }
         setVisible(false);
         detailPage.setVisible(true);
@@ -312,6 +372,19 @@ public class ProjectsPage extends JFrame implements ActionListener {
         return "<html><div style='width:" + width + "px'>" + text + "</div></html>";
     }
 
+    private String formatDate(java.sql.Date date) {
+        return date == null ? "TBA" : date.toLocalDate().format(DATE_FORMAT);
+    }
+
+    private int imageNumber(String projectId) {
+        switch (projectId) {
+            case "SSD": return 0;
+            case "SSF": return 1;
+            case "CCC": return 2;
+            default: return -1;
+        }
+    }
+
     private void loadReferenceImage() {
         try (InputStream stream = ProjectsPage.class.getResourceAsStream("/images/projects-reference.jpg")) {
             if (stream != null) referenceImage = ImageIO.read(stream);
@@ -321,7 +394,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
     }
 
     private Image getProjectImage(int imageNumber) {
-        if (referenceImage == null) return null;
+        if (referenceImage == null || imageNumber < 0) return null;
         int[][] crops = {{61, 259, 237, 132}, {426, 258, 240, 133}, {835, 264, 175, 116}};
         int[] crop = crops[imageNumber];
         return referenceImage.getSubimage(crop[0], crop[1], crop[2], crop[3]);

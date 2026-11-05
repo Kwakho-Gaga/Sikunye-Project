@@ -13,12 +13,20 @@ public class Project {
     private Date startDate;
     private Date endDate;
     private BigDecimal goalAmount;
+    private int progressPercent;
 
     public Project() {
     }
 
     public Project(String projectId, String name, String ownerName, String description,
             String status, Date startDate, Date endDate, BigDecimal goalAmount) {
+        this(projectId, name, ownerName, description, status, startDate,
+                endDate, goalAmount, 0);
+    }
+
+    public Project(String projectId, String name, String ownerName, String description,
+            String status, Date startDate, Date endDate, BigDecimal goalAmount,
+            int progressPercent) {
         this.projectId = projectId;
         this.name = name;
         this.ownerName = ownerName;
@@ -27,6 +35,7 @@ public class Project {
         this.startDate = startDate;
         this.endDate = endDate;
         this.goalAmount = goalAmount;
+        this.progressPercent = progressPercent;
     }
 
     public String getProjectId() {
@@ -91,5 +100,13 @@ public class Project {
 
     public void setGoalAmount(BigDecimal goalAmount) {
         this.goalAmount = goalAmount;
+    }
+
+    public int getProgressPercent() {
+        return progressPercent;
+    }
+
+    public void setProgressPercent(int progressPercent) {
+        this.progressPercent = progressPercent;
     }
 }
