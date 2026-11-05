@@ -1,349 +1,217 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package za.ac.cput.sikunyecharity.GUI;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.JTextComponent;
 import za.ac.cput.sikunyecharity.DAO.FeedbackDAO;
 import za.ac.cput.sikunyecharity.Domain.Feedback;
 
 /**
- *
+ * Public/Admin view for reading and tracking user reviews and feedback submissions.
+ * 
  * @author Gaga Kwakho
  */
-public class FeedbackTable extends JFrame implements ActionListener, ItemListener {
+public class FeedbackTable extends JFrame implements ActionListener {
 
-   
-    private JPanel mainPanel, ratePanel, buttonPanel, adminPanel, charityDescrPanel;
-    
-    private JLabel headerLabel;
-    private JLabel charityDescription;
-    
-    private JTextField nameTextField;
-    private JTextField emailTextField;
-    private JTextField subjectTextField;
-    private JTextArea commentTextArea;
-    private JLabel rateLabel;
+    private static final Color CYAN_PRIMARY = new Color(31, 190, 221);
+    private static final Color BG_LIGHT = new Color(246, 248, 251);
+    private static final Color CARD_BG = Color.WHITE;
+    private static final Color BORDER_COLOR = new Color(218, 224, 233);
+    private static final Color TEXT_DARK = new Color(35, 53, 65);
+
+    private static final Font TITLE_FONT = new Font("SansSerif", Font.BOLD, 18);
+    private static final Font SUBTITLE_FONT = new Font("SansSerif", Font.PLAIN, 12);
+    private static final Font FONT_BOLD = new Font("SansSerif", Font.BOLD, 13);
+    private static final Font FONT_PLAIN = new Font("SansSerif", Font.PLAIN, 13);
+
+    private JPanel mainPanel, buttonPanel, headerPanel;
+    private JLabel headerLabel, subHeaderLabel;
     
     private JButton refreshButton;
-    private JButton updateButton;
-    private JButton deleteButton;
     private JTable table;
     private DefaultTableModel tableModel;
-    private boolean isUpdating = false;
-    private JToggleButton[] star = new JToggleButton[5];
-    private int currentRating;
     private FeedbackGUI feedbackForm;
 
-    Font font1 = new Font("Inter", Font.BOLD, 20);
-    Font font2 = new Font("Inter", Font.PLAIN, 20);
-    Font font3 = new Font("Inter", Font.PLAIN, 15);
-    Font font4 = new Font("Inter", Font.BOLD, 15);
-    Font font5 = new Font("Inter", Font.BOLD, 16);
-    Font font6 = new Font("Inter", Font.BOLD, 14);
-
-    Color color1 = new Color(0, 192, 232);
-    Color color2 = Color.WHITE;
-    Color color3 = new Color(245, 239, 247);
-    Color color4 = new Color(245, 245, 245);
-    // footer
-    Color color5 = new Color(43, 55, 63, 230);
-    //strokein footer
-    Color color6 = new Color(142, 142, 147);
-    Color color7 = new Color(179, 179, 179);
-
-    private JPanel createLeftAlignedPanel(JLabel label, JComponent field) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        field.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(label);
-        panel.add(Box.createRigidArea(new Dimension(0, 5))); // small space between label and field
-        panel.add(field);
-        panel.setOpaque(false);
-        return panel;
-    }
-
     public FeedbackTable(FeedbackGUI feedbackForm) {
-        this.feedbackForm=feedbackForm;
-        
-        charityDescrPanel = new JPanel();
-        
-        
-        adminPanel = new JPanel();
-        
-        mainPanel = new JPanel();
-        ratePanel = new JPanel();
-        buttonPanel = new JPanel();
-        charityDescription = new JLabel("Together we are one");
-        charityDescription.setForeground(color1);
-        charityDescription.setFont(font6);
-        headerLabel = new JLabel("Sikunye Charity");
-        headerLabel.setForeground(color1);
-        headerLabel.setFont(font6);
+        super("Sikunye Charity - Community Reviews & Feedback");
+        this.feedbackForm = feedbackForm;
 
-        nameTextField = new JTextField();
-        emailTextField = new JTextField();
-        subjectTextField = new JTextField();
-        commentTextArea = new JTextArea();
+        setLayout(new BorderLayout());
+        setBackground(BG_LIGHT);
 
-        setupTextField(nameTextField, "Name");
-        setupTextField(emailTextField, "Email");
-        setupTextField(subjectTextField, "Subject");
-        setupTextArea(commentTextArea, "Comment/Feedback");
+        // 1. Top Header Banner
+        headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(CYAN_PRIMARY);
+        headerPanel.setBorder(new EmptyBorder(16, 24, 16, 24));
 
-        rateLabel = new JLabel("Rate Us");
-        for (int i = 0; i < 5; i++) {
-            star[i] = createStar();
-        }
+        headerLabel = new JLabel("Community Reviews & Feedback", SwingConstants.CENTER);
+        headerLabel.setFont(TITLE_FONT);
+        headerLabel.setForeground(Color.WHITE);
 
-       
+        subHeaderLabel = new JLabel("Browse feedback, testimonials, and ratings submitted by donors and community members", SwingConstants.CENTER);
+        subHeaderLabel.setFont(SUBTITLE_FONT);
+        subHeaderLabel.setForeground(new Color(240, 250, 255));
 
-        refreshButton = new JButton("REFRESH");
-        refreshButton.setFont(font6);
-        refreshButton.setBackground(Color.LIGHT_GRAY);
-        refreshButton.setBorder(new EmptyBorder(5, 30, 5, 35));
-        refreshButton.setForeground(color2);
-        refreshButton.setOpaque(true);
-        deleteButton = new JButton("DELETE");
-        deleteButton.setFont(font6);
-        deleteButton.setBackground(Color.red);
-        deleteButton.setBorder(new EmptyBorder(5, 30, 5, 35));
-        deleteButton.setForeground(color2);
-        deleteButton.setOpaque(true);
-        updateButton = new JButton("UPDATE");
-        updateButton.setFont(font6);
-        updateButton.setBackground(Color.ORANGE);
-        updateButton.setBorder(new EmptyBorder(5, 30, 5, 35));
-        updateButton.setForeground(color2);
-        updateButton.setOpaque(true);
-        
+        JPanel titleBox = new JPanel();
+        titleBox.setOpaque(false);
+        titleBox.setLayout(new BoxLayout(titleBox, BoxLayout.Y_AXIS));
+        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subHeaderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleBox.add(headerLabel);
+        titleBox.add(Box.createRigidArea(new Dimension(0, 4)));
+        titleBox.add(subHeaderLabel);
+
+        headerPanel.add(titleBox, BorderLayout.CENTER);
+        add(headerPanel, BorderLayout.NORTH);
+
+        // 2. Action Toolbar (Centered Single Refresh Button)
+        buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 12));
+        buttonPanel.setBackground(CARD_BG);
+        buttonPanel.setBorder(new MatteBorder(0, 0, 1, 0, BORDER_COLOR));
+
+        refreshButton = createRoundedButton("Refresh Records", CYAN_PRIMARY);
         refreshButton.addActionListener(this);
-        deleteButton.addActionListener(this);
-        updateButton.addActionListener(this);
 
-        tableModel = new DefaultTableModel();
+        buttonPanel.add(refreshButton);
+
+        // 3. Table Configuration
+        tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Read-only view
+            }
+        };
+
         table = new JTable(tableModel);
-        tableModel.addColumn("Feedback_Id");
+        table.setRowHeight(32);
+        table.setFont(FONT_PLAIN);
+        table.setSelectionBackground(new Color(225, 245, 250));
+        table.setSelectionForeground(TEXT_DARK);
+        table.setGridColor(new Color(235, 240, 245));
+        table.setShowVerticalLines(false);
+
+        // Custom Table Header Styling
+        table.getTableHeader().setFont(FONT_BOLD);
+        table.getTableHeader().setBackground(new Color(238, 242, 246));
+        table.getTableHeader().setForeground(TEXT_DARK);
+        table.getTableHeader().setPreferredSize(new Dimension(0, 36));
+        table.getTableHeader().setBorder(new MatteBorder(0, 0, 1, 0, BORDER_COLOR));
+
+        tableModel.addColumn("ID");
         tableModel.addColumn("Name");
         tableModel.addColumn("Email");
         tableModel.addColumn("Subject");
-        tableModel.addColumn("Comment");
-        tableModel.addColumn("Rating");
-        table.addMouseListener(new MouseAdapter() {
-    @Override
-    public void mouseClicked(MouseEvent arg0) {
-        int i = table.getSelectedRow();
+        tableModel.addColumn("Feedback Comment");
+        tableModel.addColumn("Rating (★)");
 
-        if (i != -1) {
-            String id = table.getValueAt(i, 0).toString();
-            String name = table.getValueAt(i, 1).toString();
-            String email = table.getValueAt(i, 2).toString();
-            String subject = table.getValueAt(i, 3).toString();
-            String comment = table.getValueAt(i, 4).toString();
-            int rating = Integer.parseInt(
-                    table.getValueAt(i, 5).toString()
-            );
+        // Column widths
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);
+        table.getColumnModel().getColumn(1).setPreferredWidth(130);
+        table.getColumnModel().getColumn(2).setPreferredWidth(160);
+        table.getColumnModel().getColumn(3).setPreferredWidth(130);
+        table.getColumnModel().getColumn(4).setPreferredWidth(320);
+        table.getColumnModel().getColumn(5).setPreferredWidth(80);
 
-            // Fill the fields in FeedbackTable
-            nameTextField.setText(name);
-            nameTextField.setForeground(Color.BLACK);
-            emailTextField.setText(email);
-            emailTextField.setForeground(Color.BLACK);
-            subjectTextField.setText(subject);
-            subjectTextField.setForeground(Color.BLACK);
-            commentTextArea.setText(comment);
-            commentTextArea.setForeground(Color.BLACK);
-            setStar(rating);
+        // Center alignment for ID & Rating columns
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
 
-            // Fill the form in FeedbackGUI and change SUBMIT to Update
-            if (feedbackForm != null) {
-                feedbackForm.populateFromFields(
-                        id, name, email, subject, comment, rating
-                );
-            }
-        }
-    }
-}); 
-       loadData();
+        // 4. Main Table Card Container
+        mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(BG_LIGHT);
+        mainPanel.setBorder(new EmptyBorder(20, 24, 20, 24));
+
+        JPanel tableCard = new JPanel(new BorderLayout());
+        tableCard.setBackground(CARD_BG);
+        tableCard.setBorder(new LineBorder(BORDER_COLOR, 1, true));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(null);
+        scrollPane.getViewport().setBackground(CARD_BG);
+
+        tableCard.add(buttonPanel, BorderLayout.NORTH);
+        tableCard.add(scrollPane, BorderLayout.CENTER);
+
+        mainPanel.add(tableCard, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
+
+        loadData();
+
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(980, 620);
+        setLocationRelativeTo(null);
     }
 
     public void setGui() {
-        this.setTitle("Feedback Table");
-         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-        buttonPanel.setLayout(new FlowLayout());
-        buttonPanel.add(refreshButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(deleteButton);
-        JScrollPane scroll = new JScrollPane(table);
-
-        mainPanel.add(buttonPanel);
-        mainPanel.add(scroll);
-
-        this.add(mainPanel);
-
-        
+        setVisible(true);
     }
 
-    private void setPlaceholder(JTextComponent field, String placeholder) {
-        field.setText(placeholder);
-        field.setForeground(Color.GRAY);
-    }
-
-// For JTextField
-    private void setupTextField(JTextField field, String placeholder) {
-        setPlaceholder(field, placeholder);
-        field.setForeground(Color.GRAY);
-        field.addKeyListener(new KeyAdapter() {
+    private JButton createRoundedButton(String text, Color bgColor) {
+        JButton btn = new JButton(text) {
             @Override
-            public void keyTyped(KeyEvent e) {
-                if (field.getForeground().equals(Color.GRAY)) {
-                    field.setText("");
-                    field.setForeground(Color.BLACK);
-                }
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
+                super.paintComponent(g);
+                g2.dispose();
             }
-        });
-        field.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (field.getText().isEmpty()) {
-                    setPlaceholder(field, placeholder);
-                }
-            }
-        });
+        };
+        btn.setFont(FONT_BOLD);
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(bgColor);
+        btn.setContentAreaFilled(false);
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(8, 22, 8, 22));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
-// For JTextArea
-    private void setupTextArea(JTextArea area, String placeholder) {
-        setPlaceholder(area, placeholder);
-        area.setForeground(Color.GRAY);
-        area.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if (area.getForeground().equals(Color.GRAY)) {
-                    area.setText("");
-                    area.setForeground(Color.BLACK);
-                }
-            }
-        });
-        area.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (area.getText().isEmpty()) {
-                    setPlaceholder(area, placeholder);
-                }
-            }
-        });
-    }
-
-    private JToggleButton createStar() {
-        JToggleButton star = new JToggleButton("\u2606");
-        star.setBorderPainted(false);
-        star.setContentAreaFilled(false);
-        star.setFocusPainted(false);
-        star.setOpaque(false);
-        star.setFont(new Font("SansSerif", Font.PLAIN, 25));
-        star.addItemListener(this);
-        return star;
-    }
-
-    private void setStar(int rating) {
-        isUpdating = true;
-        currentRating = rating;
-
-        for (int i = 0; i < star.length; i++) {
-            if (i < rating) {
-                star[i].setForeground(Color.YELLOW);
-                star[i].setSelected(true);
-            } else {
-                star[i].setForeground(Color.BLACK);
-                star[i].setSelected(true);
-            }
-        }
-        isUpdating = false; // allow user interaction
-    }
-
-    private void clearStar() {
-        isUpdating = true;
-        for (JToggleButton star : star) {
-            star.setSelected(false);
-            star.setForeground(Color.BLACK);
-        }
-        currentRating = 0;
-        isUpdating = false;
-    }
-
-    public int getRate() {
-        return currentRating;
-    }
-
-    public void refresh() {
-        setupTextField(nameTextField, "Name");
-        setupTextField(emailTextField, "Email");
-        setupTextField(subjectTextField, "Subject");
-        setupTextArea(commentTextArea, "Comment/Feedback");
-
-        clearStar();
-        nameTextField.requestFocus();
-
-    }
-
-    public void refreshTable() {
-
+    public void loadData() {
         FeedbackDAO feedbackDAO = new FeedbackDAO();
-
-        try {
-
-            ArrayList<Feedback> feedbackList = feedbackDAO.getAllFeedback();
-
-            tableModel.setRowCount(0);
-
+        ArrayList<Feedback> feedbackList = feedbackDAO.getAllFeedback();
+        tableModel.setRowCount(0);
+        if (feedbackList == null || feedbackList.isEmpty()) {
+            try {
+                feedbackList = feedbackDAO.getAll();
+            } catch (Exception ignored) {
+            }
+        }
+        if (feedbackList != null && !feedbackList.isEmpty()) {
             for (Feedback f : feedbackList) {
-                Object[] row = {
+                Object[] rowData = {
                     f.getFeedbackId(),
                     f.getName(),
                     f.getEmail(),
@@ -351,150 +219,24 @@ public class FeedbackTable extends JFrame implements ActionListener, ItemListene
                     f.getFeedback(),
                     f.getRating()
                 };
-                tableModel.addRow(row);
+                tableModel.addRow(rowData);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error refreshing data");
         }
-    } 
-    public void loadData(){
-    
-    try {
-                FeedbackDAO feedbackDAO = new FeedbackDAO();
-                // Clear existing rows
-                tableModel.setRowCount(0);
-
-                ArrayList<Feedback> feedbackList = feedbackDAO.getAll();
-                if (feedbackList.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No records found,wait for user to submit feedback");
-
-                } else {
-
-                    for (Feedback f : feedbackList) {
-                        String[] rowData = {
-                            String.valueOf(f.getFeedbackId()),
-                            f.getName(),
-                            f.getEmail(),
-                            f.getSubject(),
-                            f.getFeedback(),
-                            String.valueOf(f.getRating()),};
-                        tableModel.addRow(rowData);
-
-                    }
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(FeedbackGUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-    
-    
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-       
         if (e.getSource() == refreshButton) {
-         refreshTable()  ; 
+            loadData();
+            JOptionPane.showMessageDialog(this, "Feedback records refreshed.", "Table Refreshed", JOptionPane.INFORMATION_MESSAGE);
         }
-        else if (e.getSource() == deleteButton) {
-            FeedbackDAO feedbackDAO = new FeedbackDAO();
-            int selectedRow = table.getSelectedRow();
-
-            if (selectedRow != -1) {
-                // Assuming ID is in column 0
-                int feedbackId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-
-                // Call your DAO delete method
-                int response = JOptionPane.showConfirmDialog(
-                        null,
-                        "Are you sure you want to delete this row?",
-                        "Confirmation",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE
-                );
-                if (response == JOptionPane.YES_OPTION) {
-                    int result = feedbackDAO.deleteById(feedbackId);
-                    if (result > 0) {
-                        JOptionPane.showMessageDialog(null, "Record deleted successfully!");
-                        refresh();
-                        refreshTable();
-                    } else {
-
-                        refresh();
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to delete");
-            }
-
-        } else if (e.getSource() == updateButton) {
-            int selectedRow = table.getSelectedRow();
-            if (selectedRow != -1) {
-                int feedbackId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-                String name = nameTextField.getText();
-                String email = emailTextField.getText();
-                String subject = subjectTextField.getText();
-                String comment = commentTextArea.getText();
-                int rate = getRate();
-
-                if (!name.isEmpty() && !name.equals("Name") && !email.isEmpty() && !email.equals("Email") && !subject.isEmpty()
-                        && !subject.equals("Subject") && !comment.isEmpty() && !comment.equals("Comment/Feedback")) {
-                    Feedback feedback = new Feedback(feedbackId, name, email, subject, comment, rate);
-                    FeedbackDAO feedbackDAO = new FeedbackDAO();
-                    int result = feedbackDAO.updateById(feedback);
-                    if (result > 0) {
-                        JOptionPane.showMessageDialog(null, "Record updated successfully!");
-                        refresh();
-                        refreshTable();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "No record found with that ID");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please fill in all fields before updating");
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to update");
-            }
-        }
-
     }
 
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (isUpdating) {
-            return;
-        }
-        for (int i = 0; i < star.length; i++) {
-            if (e.getSource() == star[i]) {
-                setStar(i + 1); // always set rating to this star's position, no toggle-to-0
-                if (getRate() > 0) {
-                    JOptionPane.showMessageDialog(null, "You have rated us " + getRate());
-                }
-
-                break;
-
-            }
-        }
-
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            FeedbackGUI feedback = new FeedbackGUI();
+            FeedbackTable feedbackTable = new FeedbackTable(feedback);
+            feedbackTable.setVisible(true);
+        });
     }
-    
-   public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        FeedbackGUI feedback = new FeedbackGUI();
-        feedback.setGui();
-        feedback.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        feedback.pack();
-        feedback.setLocationRelativeTo(null);
-        feedback.setVisible(true);
-
-        FeedbackTable feedbackTable = new FeedbackTable(feedback);
-        feedbackTable.setGui();
-        feedbackTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        feedbackTable.setSize(900, 700);
-        feedbackTable.setLocationRelativeTo(feedback);
-        feedbackTable.setVisible(true);
-    });
-} 
-    
 }

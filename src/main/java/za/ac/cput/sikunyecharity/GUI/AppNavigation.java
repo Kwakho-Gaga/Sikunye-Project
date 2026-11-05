@@ -69,10 +69,10 @@ public final class AppNavigation {
                 next = contact;
                 break;
             case "Feedback":
-                FeedbackGUI feedback = new FeedbackGUI();
-                feedback.setGui();
-                next = feedback;
-                break;
+                FeedbackGUI feedback = new FeedbackGUI(current);
+                feedback.setVisible(true);
+                return;
+                //break;
             case "Items Donated":
             case "ItemsDonated":
             case "Inventory":

@@ -8,9 +8,11 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -18,6 +20,7 @@ import java.net.URL;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,6 +41,7 @@ public class FooterPanel extends JPanel {
     private static final Font TEXT_FONT = new Font("SansSerif", Font.PLAIN, 13);
     private static final Font BOLD_FONT = new Font("SansSerif", Font.BOLD, 13);
     private static final Font SMALL_FONT = new Font("SansSerif", Font.PLAIN, 12);
+    private static final Font BUTTON_FONT = new Font("SansSerif", Font.BOLD, 12);
 
     public FooterPanel() {
         this(null);
@@ -119,7 +123,7 @@ public class FooterPanel extends JPanel {
         col3.add(Box.createRigidArea(new Dimension(0, 6)));
         col3.add(lblHours);
 
-        // Column 4: Follow Us & Social Media
+        // Column 4: Follow Us & Reviews Button
         JPanel col4 = createColumnPanel();
 
         JLabel lblSocial = createLeftLabel("Follow Our Journey", TITLE_FONT, Color.WHITE);
@@ -139,11 +143,21 @@ public class FooterPanel extends JPanel {
         socialRow.add(Box.createRigidArea(new Dimension(14, 0)));
         socialRow.add(inIcon);
 
+        // Styled Reviews / Feedback Table Launcher Button
+        JButton btnReviews = createReviewsButton("★ View All Reviews");
+        btnReviews.addActionListener(e -> {
+            FeedbackGUI feedbackForm = new FeedbackGUI(currentFrame);
+            FeedbackTable feedbackTable = new FeedbackTable(feedbackForm);
+            feedbackTable.setVisible(true);
+        });
+
         col4.add(lblSocial);
         col4.add(Box.createRigidArea(new Dimension(0, 12)));
         col4.add(lblSocialSub);
         col4.add(Box.createRigidArea(new Dimension(0, 14)));
         col4.add(socialRow);
+        col4.add(Box.createRigidArea(new Dimension(0, 16)));
+        col4.add(btnReviews);
 
         gridPanel.add(col1);
         gridPanel.add(col2);
@@ -185,6 +199,47 @@ public class FooterPanel extends JPanel {
         return label;
     }
 
+    private JButton createReviewsButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.setColor(CYAN_ACCENT);
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+
+        btn.setFont(BUTTON_FONT);
+        btn.setForeground(CYAN_ACCENT);
+        btn.setBackground(FOOTER_BG);
+        btn.setContentAreaFilled(false);
+        btn.setFocusPainted(false);
+        btn.setBorder(new EmptyBorder(7, 16, 7, 16));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(CYAN_ACCENT);
+                btn.setForeground(Color.WHITE);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(FOOTER_BG);
+                btn.setForeground(CYAN_ACCENT);
+            }
+        });
+
+        return btn;
+    }
+
     private JLabel createSocialIcon(String iconPath, String fallbackText, String platformName) {
         JLabel iconLabel = new JLabel();
         iconLabel.setToolTipText("Visit Sikunye Charity on " + platformName);
@@ -197,7 +252,6 @@ public class FooterPanel extends JPanel {
             ImageIcon rawIcon = new ImageIcon(imgUrl);
             Image scaledImage = rawIcon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
             
-            // Generate standard (White/Light Muted) and hover (Cyan) icons dynamically
             ImageIcon normalIcon = tintIcon(scaledImage, TEXT_NORMAL);
             ImageIcon cyanHoverIcon = tintIcon(scaledImage, CYAN_ACCENT);
 
@@ -215,7 +269,6 @@ public class FooterPanel extends JPanel {
                 }
             });
         } else {
-            // Text fallback styling
             iconLabel.setText(fallbackText);
             iconLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
             iconLabel.setForeground(TEXT_MUTED);
