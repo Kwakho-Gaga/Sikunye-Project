@@ -1841,11 +1841,17 @@ donateButton.setFocusPainted(
         }
 
         if ("DonationsRecieved".equals(destination)) {
-            DonationGUI donationsPage = new DonationGUI();
-            donationsPage.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            donationsPage.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            donationsPage.setLocationRelativeTo(null);
-            donationsPage.setVisible(true);
+           // Create a new JFrame to hold the DonationGUI panel
+JFrame frame = new JFrame("Donation Management");
+DonationGUI donationsPage = new DonationGUI();
+
+// Call window methods on 'frame', not 'donationsPage'
+frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+frame.setLocationRelativeTo(null);
+
+frame.setContentPane(donationsPage);
+frame.setVisible(true);
             dispose();
             return;
         }
