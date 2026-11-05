@@ -6,6 +6,7 @@ package za.ac.cput.sikunyecharity.GUI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -313,14 +314,22 @@ public class ProjecTable extends JFrame implements ActionListener {
         JSplitPane tables = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 projectPanel, donationPanel);
         tables.setResizeWeight(0.45);
+        tables.setPreferredSize(new Dimension(1050, 350));
 
         content.add(tables, BorderLayout.CENTER);
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         bottom.setOpaque(false);
         bottom.add(btnBack);
         content.add(bottom, BorderLayout.SOUTH);
+        content.setPreferredSize(new Dimension(1080,
+                top.getPreferredSize().height + 470));
+        JScrollPane pageScroll = new JScrollPane(content);
+        pageScroll.setBorder(null);
+        pageScroll.getVerticalScrollBar().setUnitIncrement(18);
+        JPanel scrollContent = new JPanel(new BorderLayout());
+        scrollContent.add(pageScroll, BorderLayout.CENTER);
         BeneficiaryPageStyle.setup(this, "Manage Projects",
-                "Add projects, review donations, and maintain their records.", content);
+                "Add projects, review donations, and maintain their records.", scrollContent);
 
         // Events
         btnRegister.addActionListener(this);
