@@ -10,7 +10,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -45,6 +50,7 @@ public class ProjecTable extends JFrame implements ActionListener {
     private JTextField txtStartDate;
     private JTextField txtEndDate;
     private JTextField txtGoalAmount;
+    private JTextField txtProgress;
 
     private JTextField txtUserName;
     private JTextField txtUserEmail;
@@ -62,6 +68,9 @@ public class ProjecTable extends JFrame implements ActionListener {
     private final ProjectsPage projectsPage;
 
     private JButton btnRegister;
+    private JButton btnAddProject;
+    private JButton btnUpdateProject;
+    private JButton btnArchiveProject;
     private JButton btnClear;
     private JButton btnRefresh;
     private JButton btnBack;
@@ -92,6 +101,7 @@ public class ProjecTable extends JFrame implements ActionListener {
             @Override
             public void windowClosed(WindowEvent event) {
                 if (ProjecTable.this.projectsPage != null) {
+                    ProjecTable.this.projectsPage.refreshProjects();
                     ProjecTable.this.projectsPage.setVisible(true);
                 }
             }
@@ -107,7 +117,7 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         // Left panel - labels
         JPanel labelPanel
-                = new JPanel(new GridLayout(10, 1, 5, 5));
+                = new JPanel(new GridLayout(11, 1, 5, 5));
 
         labelPanel.add(
                 new JLabel("Project ID:")
@@ -141,6 +151,8 @@ public class ProjecTable extends JFrame implements ActionListener {
                 new JLabel("Goal Amount:")
         );
 
+        labelPanel.add(new JLabel("Progress (%):"));
+
         labelPanel.add(
                 new JLabel("User Name:")
         );
@@ -151,11 +163,11 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         // Right panel - textfields
         JPanel fieldPanel
-                = new JPanel(new GridLayout(10, 1, 5, 5));
+                = new JPanel(new GridLayout(11, 1, 5, 5));
 
         txtProjectID
                 = new JTextField();
-        txtProjectID.setEditable(false);
+        txtProjectID.setEditable(true);
 
         txtProjectName
                 = new JTextField();
@@ -178,6 +190,9 @@ public class ProjecTable extends JFrame implements ActionListener {
         txtGoalAmount
                 = new JTextField();
 
+        txtProgress
+                = new JTextField("0");
+
         txtUserName
                 = new JTextField();
 
@@ -192,6 +207,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         fieldPanel.add(txtStartDate);
         fieldPanel.add(txtEndDate);
         fieldPanel.add(txtGoalAmount);
+        fieldPanel.add(txtProgress);
         fieldPanel.add(txtUserName);
         fieldPanel.add(txtUserEmail);
 
@@ -211,6 +227,10 @@ public class ProjecTable extends JFrame implements ActionListener {
         btnRegister
                 = new JButton("Register");
 
+        btnAddProject = new JButton("Add Project");
+        btnUpdateProject = new JButton("Update Project");
+        btnArchiveProject = new JButton("Archive Project");
+
         btnClear
                 = new JButton("Clear");
 
@@ -221,6 +241,9 @@ public class ProjecTable extends JFrame implements ActionListener {
                 = new JButton("Back to Projects");
 
         buttonPanel.add(btnRegister);
+        buttonPanel.add(btnAddProject);
+        buttonPanel.add(btnUpdateProject);
+        buttonPanel.add(btnArchiveProject);
         buttonPanel.add(btnClear);
         buttonPanel.add(btnRefresh);
         buttonPanel.add(btnBack);
@@ -234,7 +257,7 @@ public class ProjecTable extends JFrame implements ActionListener {
             "Status",
             "Start Date",
             "End Date",
-            "Goal Amount"
+            "Goal Amount", "Progress (%)"
         };
 
         projectTableModel
@@ -297,6 +320,9 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         // Events
         btnRegister.addActionListener(this);
+        btnAddProject.addActionListener(this);
+        btnUpdateProject.addActionListener(this);
+        btnArchiveProject.addActionListener(this);
 
         btnClear.addActionListener(this);
 
@@ -321,6 +347,12 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         if (source == btnRegister) {
             registerUser();
+        } else if (source == btnAddProject) {
+            addProject();
+        } else if (source == btnUpdateProject) {
+            updateProject();
+        } else if (source == btnArchiveProject) {
+            archiveProject();
         } else if (source == btnClear) {
             clearFields();
         } else if (source == btnRefresh) {
@@ -351,7 +383,8 @@ public class ProjecTable extends JFrame implements ActionListener {
                     project.getStatus(),
                     project.getStartDate(),
                     project.getEndDate(),
-                    project.getGoalAmount()
+                    project.getGoalAmount(),
+                    project.getProgressPercent()
                 });
             }
             if (projectId != null) {
@@ -413,6 +446,8 @@ public class ProjecTable extends JFrame implements ActionListener {
         txtGoalAmount.setText(
                 cellText(row, 7)
         );
+        txtProgress.setText(cellText(row, 8));
+        txtProjectID.setEditable(false);
         loadDonations(cellText(row, 0));
     }
 
@@ -460,6 +495,122 @@ public class ProjecTable extends JFrame implements ActionListener {
             return false;
         }
         return true;
+    }
+
+    private Project projectFromFields() {
+        String id = txtProjectID.getText().trim().toUpperCase(Locale.ROOT);
+        String name = txtProjectName.getText().trim();
+        String owner = txtOwnerName.getText().trim();
+        String description = txtDescription.getText().trim();
+        String status = txtStatus.getText().trim();
+        if (id.isEmpty() || name.isEmpty() || status.isEmpty()) {
+            throw new IllegalArgumentException("Project ID, name and status are required.");
+        }
+        if (id.length() > 20 || name.length() > 120 || owner.length() > 120
+                || description.length() > 2000 || status.length() > 40) {
+            throw new IllegalArgumentException("One of the project fields is too long.");
+        }
+
+        Date start = parseDate(txtStartDate.getText().trim());
+        Date end = parseDate(txtEndDate.getText().trim());
+        if (start != null && end != null && end.before(start)) {
+            throw new IllegalArgumentException("End date must be after the start date.");
+        }
+
+        BigDecimal goal = null;
+        String goalText = txtGoalAmount.getText().trim();
+        if (!goalText.isEmpty()) {
+            try {
+                goal = new BigDecimal(goalText);
+            } catch (NumberFormatException exception) {
+                throw new IllegalArgumentException("Goal amount must be a number.");
+            }
+            if (goal.signum() < 0 || goal.scale() > 2 || goal.precision() - goal.scale() > 10) {
+                throw new IllegalArgumentException("Goal amount must be positive with at most two decimals.");
+            }
+        }
+
+        int progress;
+        try {
+            progress = Integer.parseInt(txtProgress.getText().trim());
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("Progress must be a whole number from 0 to 100.");
+        }
+        if (progress < 0 || progress > 100) {
+            throw new IllegalArgumentException("Progress must be between 0 and 100.");
+        }
+        return new Project(id, name, owner, description, status, start, end, goal, progress);
+    }
+
+    private Date parseDate(String text) {
+        if (text.isEmpty()) {
+            return null;
+        }
+        try {
+            return Date.valueOf(LocalDate.parse(text));
+        } catch (DateTimeParseException exception) {
+            throw new IllegalArgumentException("Use yyyy-MM-dd for dates.");
+        }
+    }
+
+    private void addProject() {
+        if (selectedProjectId() != null) {
+            JOptionPane.showMessageDialog(this, "Click Clear before adding a new project.");
+            return;
+        }
+        try {
+            Project project = projectFromFields();
+            projectDAO.addProject(project);
+            loadProjects();
+            selectProject(project.getProjectId());
+            JOptionPane.showMessageDialog(this, "Project added.");
+        } catch (IllegalArgumentException | java.sql.SQLException exception) {
+            JOptionPane.showMessageDialog(this, "Could not add project:\n" + exception.getMessage());
+        }
+    }
+
+    private void updateProject() {
+        if (selectedProjectId() == null) {
+            JOptionPane.showMessageDialog(this, "Select a project to update.");
+            return;
+        }
+        try {
+            projectDAO.updateProject(projectFromFields());
+            loadProjects();
+            JOptionPane.showMessageDialog(this, "Project updated.");
+        } catch (IllegalArgumentException | java.sql.SQLException exception) {
+            JOptionPane.showMessageDialog(this, "Could not update project:\n" + exception.getMessage());
+        }
+    }
+
+    private void archiveProject() {
+        String id = selectedProjectId();
+        if (id == null) {
+            JOptionPane.showMessageDialog(this, "Select a project to archive.");
+            return;
+        }
+        int answer = JOptionPane.showConfirmDialog(this,
+                "Archive " + id + "? It will disappear from the public page and donor dropdown.",
+                "Archive Project", JOptionPane.YES_NO_OPTION);
+        if (answer != JOptionPane.YES_OPTION) {
+            return;
+        }
+        try {
+            projectDAO.archiveProject(id);
+            loadProjects();
+            JOptionPane.showMessageDialog(this, "Project archived.");
+        } catch (java.sql.SQLException exception) {
+            JOptionPane.showMessageDialog(this, "Could not archive project:\n" + exception.getMessage());
+        }
+    }
+
+    private void selectProject(String id) {
+        for (int row = 0; row < projectTableModel.getRowCount(); row++) {
+            if (id.equals(cellText(row, 0))) {
+                tblProjects.setRowSelectionInterval(row, row);
+                return;
+            }
+        }
     }
 
     // Register user to project
@@ -519,11 +670,13 @@ public class ProjecTable extends JFrame implements ActionListener {
         txtStartDate.setText("");
         txtEndDate.setText("");
         txtGoalAmount.setText("");
+        txtProgress.setText("0");
 
         txtUserName.setText("");
         txtUserEmail.setText("");
 
         tblProjects.clearSelection();
+        txtProjectID.setEditable(true);
         loadDonations(null);
     }
 

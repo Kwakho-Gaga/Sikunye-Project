@@ -11,7 +11,7 @@ import javax.swing.JTextArea;
 import javax.swing.Scrollable;
 import javax.swing.border.EmptyBorder;
 
-/** Shared visual elements for the three project detail pages. */
+/** Shared visual elements for project detail pages. */
 final class ProjectPageStyle {
 
     static final Color BACKGROUND = new Color(246, 248, 251);
