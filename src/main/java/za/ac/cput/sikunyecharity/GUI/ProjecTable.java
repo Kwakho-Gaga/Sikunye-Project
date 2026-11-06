@@ -37,6 +37,7 @@ import za.ac.cput.sikunyecharity.DAO.ProjectDonationDAO;
 import za.ac.cput.sikunyecharity.DAO.ProjectDAO;
 import za.ac.cput.sikunyecharity.DAO.ProjectRegistrationDAO;
 import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.Domain.ProjectDefaults;
 import za.ac.cput.sikunyecharity.Domain.ProjectDonationRecord;
 import za.ac.cput.sikunyecharity.Domain.ProjectRegistration;
 
@@ -74,6 +75,7 @@ public class ProjecTable extends JFrame implements ActionListener {
     private JButton btnRegister;
     private JButton btnAddProject;
     private JButton btnUpdateProject;
+    private JButton btnDeleteProject;
     private JButton btnArchiveProject;
     private JButton btnUnarchiveProject;
     private JButton btnClear;
@@ -229,6 +231,7 @@ public class ProjecTable extends JFrame implements ActionListener {
 
         btnAddProject = new JButton("Add Project");
         btnUpdateProject = new JButton("Update Project");
+        btnDeleteProject = new JButton("Delete Project");
         btnArchiveProject = new JButton("Archive Project");
         btnUnarchiveProject = new JButton("Unarchive Project");
 
@@ -244,6 +247,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         buttonPanel.add(btnRegister);
         buttonPanel.add(btnAddProject);
         buttonPanel.add(btnUpdateProject);
+        buttonPanel.add(btnDeleteProject);
         buttonPanel.add(btnArchiveProject);
         buttonPanel.add(btnUnarchiveProject);
         buttonPanel.add(btnClear);
@@ -251,6 +255,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         BeneficiaryPageStyle.styleButton(btnRegister, BeneficiaryPageStyle.DARK);
         BeneficiaryPageStyle.styleButton(btnAddProject, new Color(39, 189, 114));
         BeneficiaryPageStyle.styleButton(btnUpdateProject, new Color(207, 160, 18));
+        BeneficiaryPageStyle.styleButton(btnDeleteProject, new Color(208, 80, 75));
         BeneficiaryPageStyle.styleButton(btnArchiveProject, new Color(208, 80, 75));
         BeneficiaryPageStyle.styleButton(btnUnarchiveProject, new Color(31, 151, 204));
         BeneficiaryPageStyle.styleButton(btnClear, new Color(112, 126, 136));
@@ -335,6 +340,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         btnRegister.addActionListener(this);
         btnAddProject.addActionListener(this);
         btnUpdateProject.addActionListener(this);
+        btnDeleteProject.addActionListener(this);
         btnArchiveProject.addActionListener(this);
         btnUnarchiveProject.addActionListener(this);
 
@@ -365,6 +371,8 @@ public class ProjecTable extends JFrame implements ActionListener {
             addProject();
         } else if (source == btnUpdateProject) {
             updateProject();
+        } else if (source == btnDeleteProject) {
+            deleteProject();
         } else if (source == btnArchiveProject) {
             archiveProject();
         } else if (source == btnUnarchiveProject) {
@@ -475,7 +483,7 @@ public class ProjecTable extends JFrame implements ActionListener {
             for (ProjectDonationRecord donation : donations) {
                 donationTableModel.addRow(new Object[]{
                     donation.getDonationId(),
-                    donation.getDonorId(),
+                    donation.getDonorId() == 0 ? "" : donation.getDonorId(),
                     donation.getProjectId() == null
                             ? "General Fund" : donation.getProjectId(),
                     donation.getAmount(),
@@ -600,6 +608,34 @@ public class ProjecTable extends JFrame implements ActionListener {
         }
     }
 
+    private void deleteProject() {
+        String id = selectedProjectId();
+        if (id == null) {
+            JOptionPane.showMessageDialog(this, "Select a project to delete.");
+            return;
+        }
+        if (ProjectDefaults.isDefault(id)) {
+            JOptionPane.showMessageDialog(this, "The three original projects are permanent.");
+            return;
+        }
+        int answer = JOptionPane.showConfirmDialog(this,
+                "Delete " + id + " permanently?", "Delete Project",
+                JOptionPane.YES_NO_OPTION);
+        if (answer != JOptionPane.YES_OPTION) {
+            return;
+        }
+        try {
+            projectDAO.deleteProject(id);
+            loadProjects();
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Project deleted.");
+        } catch (java.sql.SQLException exception) {
+            JOptionPane.showMessageDialog(this,
+                    "Could not delete project. A linked donation or registration may exist.\n"
+                    + exception.getMessage());
+        }
+    }
+
     private void archiveProject() {
         String id = selectedProjectId();
         if (id == null) {
@@ -607,7 +643,7 @@ public class ProjecTable extends JFrame implements ActionListener {
             return;
         }
         int answer = JOptionPane.showConfirmDialog(this,
-                "Archive " + id + "? It will disappear from the public page and donor dropdown.",
+                "Archive " + id + "? It will disappear from the public projects page.",
                 "Archive Project", JOptionPane.YES_NO_OPTION);
         if (answer != JOptionPane.YES_OPTION) {
             return;
@@ -735,7 +771,7 @@ public class ProjecTable extends JFrame implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (DashboardGUI.requestAdminAccess(null)) {
+                if (ProjectAdminLogin.requestAccess(null)) {
                     new ProjecTable().setVisible(true);
                 }
             }

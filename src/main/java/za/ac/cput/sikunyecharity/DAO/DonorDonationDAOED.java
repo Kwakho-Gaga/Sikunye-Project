@@ -87,8 +87,7 @@ public class DonorDonationDAOED {
 
     public List<Project> getProjects() throws SQLException {
         List<Project> projects = new ArrayList<>();
-        String sql = "SELECT ProjectID, Name FROM ProjectTable "
-                + "WHERE Status IS NULL OR UPPER(Status) <> 'ARCHIVED' ORDER BY Name";
+        String sql = "SELECT ProjectID, Name FROM ProjectTable ORDER BY Name";
         try (Connection connection = openConnection()) {
             ensureProjectTable(connection);
             try (PreparedStatement statement = connection.prepareStatement(sql);

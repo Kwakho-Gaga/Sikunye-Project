@@ -83,16 +83,21 @@ public final class AppNavigation {
             case "donate":
             case "donation":
             case "donations":
-                DonationED donation = new DonationED();
-//                try {
-//                    donation.setGui();
-//                } catch (NoSuchMethodError | Exception e) {
-//                    try {
-//                        donation.setGUI();
-//                    } catch (Exception ignored) {
-//                    }
-//                }
-                next = donation;
+                DonorDonationGUI_ED donorPage = new DonorDonationGUI_ED();
+                next = donorPage;
+                break;
+
+            case "donationsrecieved":
+            case "donationsreceived":
+            case "donations recieved":
+            case "donations received":
+            case "donationitem":
+            case "donationitems":
+                JFrame receivedFrame = new JFrame("Sikunye Charity - Donation Item Management");
+                receivedFrame.setLayout(new java.awt.BorderLayout());
+                receivedFrame.add(new HeaderPanel(receivedFrame, "DonationsRecieved"), java.awt.BorderLayout.NORTH);
+                receivedFrame.add(new DonationItemGUI(), java.awt.BorderLayout.CENTER);
+                next = receivedFrame;
                 break;
 
             case "items donated":

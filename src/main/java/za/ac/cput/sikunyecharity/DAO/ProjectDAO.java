@@ -10,6 +10,7 @@ import java.util.List;
 import za.ac.cput.sikunyecharity.DBConection.DBConnection;
 import za.ac.cput.sikunyecharity.DBConection.ProjectSchema;
 import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.Domain.ProjectDefaults;
 
 public class ProjectDAO {
 
@@ -49,6 +50,7 @@ public class ProjectDAO {
     }
 
     public void addProject(Project project) throws SQLException {
+        rejectDefault(project.getProjectId());
         String sql = "INSERT INTO ProjectTable "
                 + "(ProjectID, Name, OwnerName, Description, Status, StartDate, "
                 + "EndDate, GoalAmount, ProgressPercent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -60,6 +62,7 @@ public class ProjectDAO {
     }
 
     public void updateProject(Project project) throws SQLException {
+        rejectDefault(project.getProjectId());
         String sql = "UPDATE ProjectTable SET Name = ?, OwnerName = ?, Description = ?, "
                 + "Status = ?, StartDate = ?, EndDate = ?, GoalAmount = ?, "
                 + "ProgressPercent = ? WHERE ProjectID = ?";
@@ -81,6 +84,7 @@ public class ProjectDAO {
     }
 
     public void archiveProject(String projectId) throws SQLException {
+        rejectDefault(projectId);
         try (Connection connection = getConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         "UPDATE ProjectTable SET Status = 'Archived' WHERE ProjectID = ?")) {
@@ -92,6 +96,7 @@ public class ProjectDAO {
     }
 
     public void unarchiveProject(String projectId, String status) throws SQLException {
+        rejectDefault(projectId);
         try (Connection connection = getConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         "UPDATE ProjectTable SET Status = ? WHERE ProjectID = ? AND UPPER(Status) = 'ARCHIVED'")) {
@@ -100,6 +105,24 @@ public class ProjectDAO {
             if (statement.executeUpdate() == 0) {
                 throw new SQLException("Archived project not found: " + projectId);
             }
+        }
+    }
+
+    public void deleteProject(String projectId) throws SQLException {
+        rejectDefault(projectId);
+        try (Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(
+                        "DELETE FROM ProjectTable WHERE ProjectID = ?")) {
+            statement.setString(1, projectId);
+            if (statement.executeUpdate() == 0) {
+                throw new SQLException("Project not found: " + projectId);
+            }
+        }
+    }
+
+    private void rejectDefault(String projectId) throws SQLException {
+        if (ProjectDefaults.isDefault(projectId)) {
+            throw new SQLException("The three original projects are permanent and cannot be changed.");
         }
     }
 

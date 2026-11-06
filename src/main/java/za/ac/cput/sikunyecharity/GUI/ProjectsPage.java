@@ -20,6 +20,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import za.ac.cput.sikunyecharity.DAO.ProjectDAO;
 import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.Domain.ProjectDefaults;
 
 public class ProjectsPage extends JFrame implements ActionListener {
 
@@ -196,11 +197,15 @@ public class ProjectsPage extends JFrame implements ActionListener {
     }
 
     private void loadProjects() {
+        projects = new ArrayList<>(ProjectDefaults.all());
         try {
-            projects = projectDAO.getVisibleProjects();
+            for (Project project : projectDAO.getVisibleProjects()) {
+                if (!ProjectDefaults.isDefault(project.getProjectId())) {
+                    projects.add(project);
+                }
+            }
             loadError = null;
         } catch (SQLException exception) {
-            projects = new ArrayList<>();
             loadError = exception.getMessage();
         }
     }
@@ -228,8 +233,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
             }
         }
         if (count == 0) {
-            cardsPanel.add(new JLabel(loadError == null
-                    ? "No projects found." : "Projects could not be loaded: " + loadError));
+            cardsPanel.add(new JLabel("No projects found."));
         }
         int rows = Math.max(1, (count + 2) / 3);
         int cardHeight = rows * 380 + (rows - 1) * 22;
@@ -319,7 +323,7 @@ public class ProjectsPage extends JFrame implements ActionListener {
 
         if (source == btnBack) {
             AppNavigation.open(this, "Home");
-        } else if (source == btnManageDonations && DashboardGUI.requestAdminAccess(this)) {
+        } else if (source == btnManageDonations && ProjectAdminLogin.requestAccess(this)) {
             ProjecTable table = new ProjecTable(this);
             setVisible(false);
             table.setVisible(true);
