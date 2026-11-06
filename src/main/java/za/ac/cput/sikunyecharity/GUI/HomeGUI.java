@@ -121,7 +121,8 @@ public class HomeGUI extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button) {
-            AppNavigation.open(this, "donation");
+            // FIXED: Get Involved -> Donor page, NOT Donation page
+            AppNavigation.open(this, "donor");
         }
     }
 
