@@ -1,13 +1,5 @@
 package za.ac.cput.sikunyecharity.GUI;
 
-import za.ac.cput.sikunyecharity.DAO.BeneficiaryDAO;
-import za.ac.cput.sikunyecharity.DAO.BeneficiaryNeedsDAO;
-import za.ac.cput.sikunyecharity.DAO.ItemDonatedDAO;
-import za.ac.cput.sikunyecharity.Domain.Beneficiary;
-import za.ac.cput.sikunyecharity.Domain.BeneficiaryNeed;
-import za.ac.cput.sikunyecharity.Domain.ItemDistributed;
-import za.ac.cput.sikunyecharity.Domain.ItemDonatedModel;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -21,6 +13,15 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+// Corrected Domain imports to match your project structure
+import za.ac.cput.sikunyecharity.Domain.ItemDistributed;
+import za.ac.cput.sikunyecharity.Domain.ItemDonatedModel;
+import za.ac.cput.sikunyecharity.DAO.BeneficiaryDAO;
+import za.ac.cput.sikunyecharity.DAO.BeneficiaryNeedsDAO;
+import za.ac.cput.sikunyecharity.DAO.ItemDonatedDAO;
+import za.ac.cput.sikunyecharity.Domain.Beneficiary;
+import za.ac.cput.sikunyecharity.Domain.BeneficiaryNeed;
 
 public class ItemDonated extends JPanel {
 
@@ -48,6 +49,9 @@ public class ItemDonated extends JPanel {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+    // Tracks authentication status
+    private boolean isLoggedIn = false;
+
     public ItemDonated() {
         setLayout(new BorderLayout());
         setBackground(backgroundBg);
@@ -62,6 +66,50 @@ public class ItemDonated extends JPanel {
 
         loadInventoryData();
         loadDistributionData();
+
+        // Default landing page set to Distributed Items
+        cardLayout.show(mainCardContainer, "DISTRIBUTION_CARD");
+    }
+
+    /**
+     * Authenticates user against static credentials (admin / 1234)
+     */
+    private boolean checkLogin() {
+        if (isLoggedIn) {
+            return true;
+        }
+
+        JPanel loginPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+        JTextField userField = new JTextField(10);
+        JPasswordField passField = new JPasswordField(10);
+
+        loginPanel.add(new JLabel("Username:"));
+        loginPanel.add(userField);
+        loginPanel.add(new JLabel("Password:"));
+        loginPanel.add(passField);
+
+        int result = JOptionPane.showConfirmDialog(
+                this, 
+                loginPanel, 
+                "Admin Login Required", 
+                JOptionPane.OK_CANCEL_OPTION, 
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            String username = userField.getText().trim();
+            String password = new String(passField.getPassword()).trim();
+
+            if ("admin".equals(username) && "1234".equals(password)) {
+                isLoggedIn = true;
+                JOptionPane.showMessageDialog(this, "Login Successful!", "Access Granted", JOptionPane.INFORMATION_MESSAGE);
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid credentials. Access denied.", "Authentication Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
+        return false;
     }
 
     private JPanel createInventoryScreen() {
@@ -177,14 +225,43 @@ public class ItemDonated extends JPanel {
 
         JButton btnDistributeItem = createStyledButton("Distribute Selected Item", primaryCyan, 200, 40);
         btnDistributeItem.addActionListener(e -> {
+            if (!checkLogin()) return;
+
             int row = inventoryTable.getSelectedRow();
             if (row == -1) {
                 JOptionPane.showMessageDialog(this, "Please select an item from the inventory table first.", "Selection Required", JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            int availableStock = Integer.parseInt(inventoryModel.getValueAt(row, 3).toString());
             String selectedItemID = inventoryModel.getValueAt(row, 0).toString();
-            txtDistItemID.setText(selectedItemID);
-            openBeneficiarySelectionDialog();
+            String itemName = inventoryModel.getValueAt(row, 2).toString();
+
+            String inputQtyStr = JOptionPane.showInputDialog(
+                    this, 
+                    "Item: " + itemName + "\nAvailable Stock: " + availableStock + "\nEnter quantity to distribute:", 
+                    "Distribution Quantity", 
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (inputQtyStr == null || inputQtyStr.trim().isEmpty()) return;
+
+            try {
+                int distQty = Integer.parseInt(inputQtyStr.trim());
+                if (distQty <= 0) {
+                    JOptionPane.showMessageDialog(this, "Quantity must be greater than zero.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (distQty > availableStock) {
+                    JOptionPane.showMessageDialog(this, "Requested quantity (" + distQty + ") exceeds available stock (" + availableStock + ").", "Insufficient Stock", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                txtDistItemID.setText(selectedItemID);
+                txtDistQuantity.setText(String.valueOf(distQty));
+                openBeneficiarySelectionDialog();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Please enter a valid numeric quantity.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         navButtonBar.add(btnViewAllDistributions);
@@ -226,14 +303,16 @@ public class ItemDonated extends JPanel {
         JButton btnDownloadReport = createStyledButton("Export Report (.txt)", primaryCyan, 180, 35);
         btnDownloadReport.addActionListener(e -> exportDistributionsToTxt());
 
-        JButton btnBack = createStyledButton("Back to Inventory", darkGrey, 160, 35);
-        btnBack.addActionListener(e -> {
-            loadInventoryData();
-            cardLayout.show(mainCardContainer, "INVENTORY_CARD");
+        JButton btnViewInventory = createStyledButton("View Inventory", darkGrey, 160, 35);
+        btnViewInventory.addActionListener(e -> {
+            if (checkLogin()) {
+                loadInventoryData();
+                cardLayout.show(mainCardContainer, "INVENTORY_CARD");
+            }
         });
 
         headerActions.add(btnDownloadReport);
-        headerActions.add(btnBack);
+        headerActions.add(btnViewInventory);
 
         headerPanel.add(headerActions, BorderLayout.EAST);
         panel.add(headerPanel, BorderLayout.NORTH);
@@ -289,9 +368,15 @@ public class ItemDonated extends JPanel {
         JButton btnDeleteDist = createStyledButton("Delete", neutralGrey, 120, 35);
         JButton btnClearDist = createStyledButton("Clear", darkGrey, 120, 35);
 
-        btnAddDist.addActionListener(e -> processDistribution());
-        btnUpdateDist.addActionListener(e -> updateDistributionRecord());
-        btnDeleteDist.addActionListener(e -> deleteDistributionRecord());
+        btnAddDist.addActionListener(e -> {
+            if (checkLogin()) processDistribution();
+        });
+        btnUpdateDist.addActionListener(e -> {
+            if (checkLogin()) updateDistributionRecord();
+        });
+        btnDeleteDist.addActionListener(e -> {
+            if (checkLogin()) deleteDistributionRecord();
+        });
         btnClearDist.addActionListener(e -> clearDistributionForm());
 
         actionPanel.add(btnAddDist);
@@ -359,30 +444,30 @@ public class ItemDonated extends JPanel {
         dialog.add(scrollPane, BorderLayout.CENTER);
 
         try {
-            BeneficiaryDAO benDAO = new BeneficiaryDAO(); // Uses BeneficiaryDAO[cite: 10]
-            BeneficiaryNeedsDAO needsDAO = new BeneficiaryNeedsDAO(); // Uses BeneficiaryNeedsDAO[cite: 10]
+            BeneficiaryDAO benDAO = new BeneficiaryDAO();
+            BeneficiaryNeedsDAO needsDAO = new BeneficiaryNeedsDAO();
 
-            List<Beneficiary> beneficiaries = benDAO.getAll(); // Uses Beneficiary
+            List<Beneficiary> beneficiaries = benDAO.getAll(); 
 
             for (Beneficiary b : beneficiaries) {
-                String fullName = b.getFirstName() + " " + b.getLastName(); // Uses Beneficiary[cite: 10, 11]
+                String fullName = b.getFirstName() + " " + b.getLastName();
                 
                 StringBuilder needsSummary = new StringBuilder();
                 try {
-                    List<BeneficiaryNeed> needs = needsDAO.getForBeneficiary(b.getBeneficiaryId()); // Uses BeneficiaryNeed[cite: 10, 11]
+                    List<BeneficiaryNeed> needs = needsDAO.getForBeneficiary(b.getBeneficiaryId()); 
                     for (BeneficiaryNeed n : needs) {
                         if (needsSummary.length() > 0) needsSummary.append(", ");
-                        needsSummary.append(n.getNeedDescription()); // Uses BeneficiaryNeed[cite: 10, 11]
+                        needsSummary.append(n.getNeedDescription()); 
                     }
                 } catch (Exception ignored) {}
 
                 String needsText = needsSummary.length() > 0 ? needsSummary.toString() : "None Assigned";
 
                 benModel.addRow(new Object[]{
-                    b.getBeneficiaryId(), // Uses Beneficiary[cite: 10, 11]
+                    b.getBeneficiaryId(),
                     fullName,
                     needsText,
-                    b.getLivingSituation() // Uses Beneficiary[cite: 10, 11]
+                    b.getLivingSituation()
                 });
             }
         } catch (Exception ex) {
@@ -405,6 +490,8 @@ public class ItemDonated extends JPanel {
 
             dialog.dispose();
             cardLayout.show(mainCardContainer, "DISTRIBUTION_CARD");
+
+            processDistribution();
         });
 
         btnCancel.addActionListener(ev -> dialog.dispose());
@@ -717,26 +804,5 @@ public class ItemDonated extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         return table;
-    }
-
-    // MAIN METHOD: Allows running this GUI standalone for testing
-    public static void main(String[] args) {
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception ignored) {}
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Sikunye Charity - Item Inventory & Distribution");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 750);
-            frame.setLocationRelativeTo(null);
-            frame.add(new ItemDonated());
-            frame.setVisible(true);
-        });
     }
 }
