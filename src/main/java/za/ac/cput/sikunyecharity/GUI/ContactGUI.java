@@ -254,10 +254,69 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
         tableModel.addColumn("User_Mobile");
         tableModel.addColumn("Status");
 
-        backButton = new JButton("Back home");
+        backButton = new JButton("Manage Quiries")
+          {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        
+        backButton.addActionListener(e -> {
+    JTextField usernameField = new JTextField();
+    JPasswordField passwordField = new JPasswordField();
+
+    Object[] fields = {
+        "Username:", usernameField,
+        "Password:", passwordField
+    };
+
+    int result = JOptionPane.showConfirmDialog(
+            this,
+            fields,
+            "Admin Login",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE
+    );
+
+    if (result != JOptionPane.OK_OPTION) {
+        return; // User cancelled
+    }
+
+    String username = usernameField.getText().trim();
+    String password = new String(passwordField.getPassword());
+
+    if (!username.equals("admin") || !password.equals("1234")) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Incorrect username or password.",
+                "Login failed",
+                JOptionPane.ERROR_MESSAGE
+        );
+        return;
+    }
+     
+
+    ContactTable contactTable = new ContactTable(this);
+    contactTable.setGui();
+    contactTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    contactTable.setSize(1000, 700);
+    contactTable.setLocationRelativeTo(this);
+    contactTable.setVisible(true);
+});
+        
+        
         backButton.setBackground(color1);
         backButton.setForeground(color2);
-        backButton.addActionListener(e -> AppNavigation.open(this, "Home"));
+         backButton.setContentAreaFilled(false);
+        backButton.setFont(font4);
+       backButton.setBorder(BorderFactory.createEmptyBorder());
+       
     }
 
     public void setGUI() {
@@ -405,7 +464,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
 
         backButtonPanel.setOpaque(true);
         backButtonPanel.setBackground(color3);
-        backButton.setPreferredSize(new Dimension(140, 40));
+        backButton.setPreferredSize(new Dimension(200, 40));
         backButton.setFont(font2);
         backButton.setBorder(BorderFactory.createEmptyBorder());
         backButtonPanel.add(backButton);

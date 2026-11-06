@@ -4,6 +4,7 @@
  */
 package za.ac.cput.sikunyecharity.GUI;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -376,7 +377,5 @@ public static void main(String[] args) {
     });
 }
 
-
-
-
 }
+
