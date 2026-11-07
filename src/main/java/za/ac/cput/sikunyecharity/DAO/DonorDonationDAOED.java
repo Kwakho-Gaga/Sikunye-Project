@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import za.ac.cput.sikunyecharity.DBConection.DBConnection;
+import za.ac.cput.sikunyecharity.DBConection.ProjectSchema;
 import za.ac.cput.sikunyecharity.Domain.Project;
 
 /**
@@ -35,8 +36,6 @@ public class DonorDonationDAOED {
             return projectId;
         }
     }
-
-    private static final String DB_SCHEMA = "ADMINISTRATOR";
 
     private static final String CREATE_DONOR_TABLE =
             "CREATE TABLE DONOR ("
@@ -78,6 +77,7 @@ public class DonorDonationDAOED {
         List<Project> projects = new ArrayList<>();
         String sql = "SELECT ProjectID, Name FROM ProjectTable ORDER BY Name";
         try (Connection connection = openConnection()) {
+            ProjectSchema.initialize(connection);
             try (PreparedStatement statement = connection.prepareStatement(sql);
                     ResultSet rows = statement.executeQuery()) {
                 while (rows.next()) {
@@ -98,6 +98,7 @@ public class DonorDonationDAOED {
     }
 
     private void createTablesIfMissing(Connection connection) throws SQLException {
+        ProjectSchema.initialize(connection);
         createTableIfMissing(connection, "DONOR", CREATE_DONOR_TABLE);
         createTableIfMissing(connection, "DONATION", CREATE_DONATION_TABLE);
         ensureDonationProjectColumn(connection);
@@ -126,7 +127,7 @@ public class DonorDonationDAOED {
         DatabaseMetaData metadata = connection.getMetaData();
         try (ResultSet tables = metadata.getTables(
                 null,
-                DB_SCHEMA,
+                connection.getSchema(),
                 tableName.toUpperCase(Locale.ROOT),
                 new String[]{"TABLE"}
         )) {
@@ -238,7 +239,7 @@ public class DonorDonationDAOED {
     private boolean columnExists(Connection connection, String tableName, String columnName)
             throws SQLException {
         try (ResultSet columns = connection.getMetaData().getColumns(
-                null, DB_SCHEMA, tableName.toUpperCase(Locale.ROOT),
+                null, connection.getSchema(), tableName.toUpperCase(Locale.ROOT),
                 columnName.toUpperCase(Locale.ROOT))) {
             return columns.next();
         }
@@ -247,7 +248,7 @@ public class DonorDonationDAOED {
     private boolean foreignKeyExists(Connection connection, String tableName, String keyName)
             throws SQLException {
         try (ResultSet keys = connection.getMetaData().getImportedKeys(
-                null, DB_SCHEMA, tableName.toUpperCase(Locale.ROOT))) {
+                null, connection.getSchema(), tableName.toUpperCase(Locale.ROOT))) {
             while (keys.next()) {
                 boolean namedProjectKey = keyName.equalsIgnoreCase(keys.getString("FK_NAME"));
                 boolean projectIdReference = "PROJECTID".equalsIgnoreCase(
