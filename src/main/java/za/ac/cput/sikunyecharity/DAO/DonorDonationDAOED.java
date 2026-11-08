@@ -175,16 +175,11 @@ public class DonorDonationDAOED {
                 insertDonor(connection, donorId, firstName, lastName, email, phoneNumber, streetAddress, city, province, postalCode);
                 int donationId = nextId(connection, "DONATION", "DONATIONID");
                 insertDonation(connection, donationId, donorId, amount, paymentMethod, donationDate, projectId, donationType);
-                if ("IN-KIND".equals(donationType)) {
-                    try (PreparedStatement itemStatement = connection.prepareStatement(
-                            "INSERT INTO ITEMS_DONATED (receiptID, itemName, quantity, itemCondition) VALUES (?, ?, ?, ?)")) {
-                        itemStatement.setInt(1, donationId);
-                        itemStatement.setString(2, itemName);
-                        itemStatement.setInt(3, itemQuantity);
-                        itemStatement.setString(4, "Not specified");
-                        itemStatement.executeUpdate();
-                    }
-                }
+                        // DELETED: Do NOT insert into ITEMS_DONATED here.
+                // DonorDonationGUI_ED already saves it ONCE with:
+                // ItemID = catalogue ID (1-5), Condition = "Good"
+                // Keeping this insert caused the double row:
+                // ItemID 8 / "Not specified" + ItemID 9 / "Good" for same ReceiptID    
                 connection.commit();
                 return new DonationLink(donationId, donorId, projectId, donationType);
             } catch (SQLException ex) {
