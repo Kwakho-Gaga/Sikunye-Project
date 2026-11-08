@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -35,9 +36,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 import za.ac.cput.sikunyecharity.DAO.ContactDAO;
 import za.ac.cput.sikunyecharity.Domain.Contact;
@@ -46,11 +50,13 @@ import za.ac.cput.sikunyecharity.Domain.Contact;
  *
  * @author Gaga Kwakho
  */
-public class ContactTable extends JFrame implements ActionListener, ItemListener {
+public class ContactTable extends JFrame
+        implements ActionListener, ItemListener {
 
-    private JPanel  mainPanel, panelButton, panelContactTable;
-    private JSplitPane split;
-    private JLabel formHeadingLabel;
+    private JPanel panelButton;
+    private JPanel panelContactTable;
+    private JPanel headerPanel;
+
     private JLabel userFullNameLabel;
     private JTextField userFullNameTextField;
     private JLabel userEmailLabel;
@@ -58,59 +64,114 @@ public class ContactTable extends JFrame implements ActionListener, ItemListener
     private JLabel userMobileLabel;
     private JTextField userMobileTextField;
     private JLabel subjectLabel;
-    private JComboBox subjectCombo;
-    // private JTextField subjectTextField;
+    private JComboBox<String> subjectCombo;
     private JLabel messageLabel;
     private JTextArea messageTextArea;
-    private JButton sendMessageButton;
+
     private JButton refreshButton;
     private JButton updateButton;
     private JButton deleteButton;
-    private int submissionId;
+
     private JTable table;
     private DefaultTableModel tableModel;
     private ContactGUI contact;
 
-    Font font6 = new Font("Inter", Font.BOLD, 14);
+    private JLabel headerLabel;
+    private JLabel subHeaderLabel;
 
-    Color color1 = new Color(0, 192, 232);
-    Color color2 = Color.WHITE;
-    Color color3 = new Color(245, 239, 247);
-    Color color4 = new Color(245, 245, 245);
-    // footer
-    Color color5 = new Color(43, 55, 63, 230);
-    //strokein footer
-    Color color6 = new Color(142, 142, 147);
-    Color color7 = new Color(179, 179, 179);
+    private static final Color CYAN_PRIMARY = new Color(31, 190, 221);
+    private static final Color BG_LIGHT = new Color(246, 248, 251);
+    private static final Color BORDER_COLOR = new Color(218, 224, 233);
+    private static final Color TEXT_DARK = new Color(35, 53, 65);
 
-    private JPanel createLeftAlignedPanel(JLabel label, JComponent field) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        field.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel.add(label);
-        panel.add(Box.createRigidArea(new Dimension(0, 5))); // small space between label and field
-        panel.add(field);
-        panel.setOpaque(false);
-        return panel;
-    }
+    private static final Font TITLE_FONT =
+            new Font("SansSerif", Font.BOLD, 18);
+    private static final Font SUBTITLE_FONT =
+            new Font("SansSerif", Font.PLAIN, 12);
+    private static final Font BUTTON_FONT =
+            new Font("SansSerif", Font.BOLD, 14);
+
+    private static final String DEFAULT_SUBJECT = "Select your query type";
 
     public ContactTable(ContactGUI contact) {
         super("Contact Table");
-         
-        
-        this.contact=contact;
-       
-        
-        panelContactTable = new JPanel();
+        this.contact = contact;
 
-        
-        panelButton = new JPanel();
-        mainPanel = new JPanel();
-       
-        
+        setLayout(new BorderLayout());
+        getContentPane().setBackground(BG_LIGHT);
+
+        createHeader();
+        createTable();
+        createButtons();
+        setGui();
+
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(1000, 700);
+        setLocationRelativeTo(null);
+    }
+
+    private void createHeader() {
+        headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(CYAN_PRIMARY);
+        headerPanel.setBorder(new EmptyBorder(16, 24, 16, 24));
+
+        headerLabel = new JLabel("Queries", SwingConstants.CENTER);
+        headerLabel.setFont(TITLE_FONT);
+        headerLabel.setForeground(Color.WHITE);
+
+        subHeaderLabel = new JLabel(
+                "Add,Update and Delete submittede queries",
+                SwingConstants.CENTER);
+        subHeaderLabel.setFont(SUBTITLE_FONT);
+        subHeaderLabel.setForeground(new Color(240, 250, 255));
+
+        JPanel titleBox = new JPanel();
+        titleBox.setOpaque(false);
+        titleBox.setLayout(new BoxLayout(titleBox, BoxLayout.Y_AXIS));
+
+        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subHeaderLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        titleBox.add(headerLabel);
+        titleBox.add(Box.createRigidArea(new Dimension(0, 4)));
+        titleBox.add(subHeaderLabel);
+
+        headerPanel.add(titleBox, BorderLayout.CENTER);
+    }
+
+    private void createTable() {
+        tableModel = new DefaultTableModel(
+                new String[]{
+                    "Contact ID",
+                    "Full Name",
+                    "Email",
+                    "Phone Number",
+                    "Subject",
+                    "Message"
+                }, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        table = new JTable(tableModel);
+        table.setRowHeight(25);
+        table.setFillsViewportHeight(true);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+        table.getTableHeader().setReorderingAllowed(false);
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                populateFieldsFromSelectedRow();
+            }
+        });
+
         userFullNameLabel = new JLabel("Full Name");
-        userFullNameTextField = new JTextField(50);
+        userFullNameTextField = new JTextField();
 
         userEmailLabel = new JLabel("Email");
         userEmailTextField = new JTextField();
@@ -119,9 +180,8 @@ public class ContactTable extends JFrame implements ActionListener, ItemListener
         userMobileTextField = new JTextField();
 
         subjectLabel = new JLabel("Subject");
-        subjectCombo = new JComboBox();
-        subjectCombo.setBackground(color2);
-        subjectCombo.addItem("Select your query type");
+        subjectCombo = new JComboBox<>();
+        subjectCombo.addItem(DEFAULT_SUBJECT);
         subjectCombo.addItem("Financial Donation");
         subjectCombo.addItem("Volunteer Opportunities");
         subjectCombo.addItem("Partnership and Collaboration");
@@ -130,252 +190,221 @@ public class ContactTable extends JFrame implements ActionListener, ItemListener
         subjectCombo.addItemListener(this);
 
         messageLabel = new JLabel("Message");
-        messageTextArea = new JTextArea();
-        messageTextArea.setBorder(new LineBorder(color7, 1));
+        messageTextArea = new JTextArea(4, 30);
+        messageTextArea.setLineWrap(true);
+        messageTextArea.setWrapStyleWord(true);
+    }
 
-       
-
+    private void createButtons() {
         refreshButton = new JButton("REFRESH");
-        refreshButton.setFont(font6);
-        refreshButton.setBackground(Color.LIGHT_GRAY);
-        refreshButton.setBorder(new EmptyBorder(5, 30, 5, 35));
-        refreshButton.setForeground(color2);
-        refreshButton.setOpaque(true);
-
         updateButton = new JButton("UPDATE");
-        updateButton.setFont(font6);
-        updateButton.setBackground(Color.ORANGE);
-        updateButton.setBorder(new EmptyBorder(5, 30, 5, 35));
-        updateButton.setForeground(color2);
-        updateButton.setOpaque(true);
         deleteButton = new JButton("DELETE");
-        deleteButton.setFont(font6);
-        deleteButton.setBackground(Color.red);
-        deleteButton.setBorder(new EmptyBorder(5, 30, 5, 35));
-        deleteButton.setForeground(color2);
-        deleteButton.setOpaque(true);
-       // sendMessageButton.addActionListener(this);
+
+        styleButton(refreshButton, Color.GRAY);
+        styleButton(updateButton, new Color(230, 150, 0));
+        styleButton(deleteButton, Color.RED);
+
         refreshButton.addActionListener(this);
         updateButton.addActionListener(this);
         deleteButton.addActionListener(this);
 
-        tableModel = new DefaultTableModel();
-        table = new JTable(tableModel);
-
-        tableModel.addColumn("Contact_ID");
-        tableModel.addColumn("Full_Name");
-        tableModel.addColumn("Email");
-        tableModel.addColumn("Phone_Number");
-        tableModel.addColumn("Subject");
-        tableModel.addColumn("Message");
-
-       table.addMouseListener(new MouseAdapter() {
-    @Override
-    public void mouseClicked(MouseEvent arg0) {
-        int i = table.getSelectedRow();
-
-        if (i != -1) {
-            String id = table.getValueAt(i, 0).toString();
-            String fullName = table.getValueAt(i, 1).toString();
-            String email = table.getValueAt(i, 2).toString();
-            String phoneNumber = table.getValueAt(i, 3).toString();
-            String subject = table.getValueAt(i, 4).toString();
-            String message = table.getValueAt(i, 5).toString();
-
-            userFullNameTextField.setText(fullName);
-            userEmailTextField.setText(email);
-            userMobileTextField.setText(phoneNumber);
-            subjectCombo.setSelectedItem(subject);
-            messageTextArea.setText(message);
-
-            if (contact != null) {
-                contact.populateContactFormFields(
-                        id, fullName, email, phoneNumber, subject, message
-                );
-            }
-        }
-    }
-});
-loadData();
-    }
-
-    public void setGui() {
-
-        panelContactTable.setLayout(new BoxLayout(panelContactTable, BoxLayout.Y_AXIS));
-
-        panelButton.setLayout(new FlowLayout());
+        panelButton = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        panelButton.setOpaque(false);
         panelButton.add(refreshButton);
         panelButton.add(updateButton);
         panelButton.add(deleteButton);
-        JScrollPane scroll = new JScrollPane(table);
-
-        panelContactTable.add(panelButton);
-        panelContactTable.add(scroll);
-
-        this.add(panelContactTable);
     }
 
-    public void refresh() {
+    private void styleButton(JButton button, Color background) {
+        button.setFont(BUTTON_FONT);
+        button.setBackground(background);
+        button.setForeground(Color.WHITE);
+        button.setOpaque(true);
+        button.setFocusPainted(false);
+        button.setBorder(new EmptyBorder(8, 18, 8, 18));
+    }
+
+    private void setGui() {
+        panelContactTable = new JPanel(new BorderLayout(10, 10));
+        panelContactTable.setBackground(BG_LIGHT);
+        panelContactTable.setBorder(new EmptyBorder(16, 24, 20, 24));
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
+
+        panelContactTable.add(panelButton, BorderLayout.NORTH);
+        panelContactTable.add(scrollPane, BorderLayout.CENTER);
+
+        add(headerPanel, BorderLayout.NORTH);
+        add(panelContactTable, BorderLayout.CENTER);
+
+        loadData();
+    }
+
+    private void populateFieldsFromSelectedRow() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            return;
+        }
+
+        userFullNameTextField.setText(valueAt(row, 1));
+        userEmailTextField.setText(valueAt(row, 2));
+        userMobileTextField.setText(valueAt(row, 3));
+        subjectCombo.setSelectedItem(valueAt(row, 4));
+        messageTextArea.setText(valueAt(row, 5));
+
+        if (contact != null) {
+            contact.populateContactFormFields(
+                    valueAt(row, 0),
+                    valueAt(row, 1),
+                    valueAt(row, 2),
+                    valueAt(row, 3),
+                    valueAt(row, 4),
+                    valueAt(row, 5)
+            );
+        }
+    }
+
+    private String valueAt(int row, int column) {
+        Object value = table.getValueAt(row, column);
+        return value == null ? "" : value.toString();
+    }
+
+    private void clearFields() {
         userFullNameTextField.setText("");
         userEmailTextField.setText("");
         userMobileTextField.setText("");
-        subjectCombo.setSelectedItem("Select your query type");
+        subjectCombo.setSelectedItem(DEFAULT_SUBJECT);
         messageTextArea.setText("");
-        userFullNameTextField.requestFocus();
-
+        table.clearSelection();
     }
 
     public void refreshTable() {
+        loadData();
+    }
 
-        ContactDAO contactDAO = new ContactDAO();
-
+    private void loadData() {
         try {
-            // Fetch latest data from the database
-            ArrayList<Contact> contactList = contactDAO.getAllContact();
+            ContactDAO contactDAO = new ContactDAO();
+            ArrayList<Contact> contactList = contactDAO.getAll();
 
-            // Clear existing data in the table
             tableModel.setRowCount(0);
 
-            // Populate table with new data
             for (Contact c : contactList) {
-                Object[] row = {
-                    c.getContactId(), // assuming getContactId() returns the contact's ID
+                tableModel.addRow(new Object[]{
+                    c.getContactId(),
                     c.getFullName(),
                     c.getEmail(),
                     c.getPhoneNumber(),
                     c.getSubject(),
                     c.getMessage()
-                };
-                tableModel.addRow(row);
+                });
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error refreshing data");
+        } catch (Exception ex) {
+            Logger.getLogger(ContactTable.class.getName())
+                    .log(Level.SEVERE, "Could not load contact records", ex);
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Could not load contact records.",
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
-public void loadData(){
 
- try {
-                ContactDAO contactDAO = new ContactDAO();
-                // Clear existing rows
-                tableModel.setRowCount(0);
-
-                ArrayList<Contact> contactList = contactDAO.getAll();
-                if (contactList.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No records found,wait for user to submit query");
-
-                } else {
-                    for (Contact c : contactList) {
-                        String[] rowData = {
-                            String.valueOf(c.getContactId()),
-                            c.getFullName(),
-                            c.getEmail(),
-                            c.getPhoneNumber(),
-                            c.getSubject(),
-                            c.getMessage()
-                        };
-                        tableModel.addRow(rowData);
-
-                    }
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(ContactTable.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-}
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-         if (e.getSource() == refreshButton) {
-           refreshTable();
-
+        if (e.getSource() == refreshButton) {
+            clearFields();
+            refreshTable();
         } else if (e.getSource() == deleteButton) {
-            ContactDAO contactDAO = new ContactDAO();
-            int selectedRow = table.getSelectedRow();
-
-            if (selectedRow != -1) {
-                // Assuming ID is in column 0
-                int contactId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-
-                // Call your DAO delete method
-                int response = JOptionPane.showConfirmDialog(
-                        null,
-                        "Are you sure you want to delete this row?",
-                        "Confirmation",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE
-                );
-                if (response == JOptionPane.YES_OPTION) {
-                    int result = contactDAO.deleteById(contactId);
-                    if (result > 0) {
-                        JOptionPane.showMessageDialog(null, "Record deleted successfully!");
-                        refresh();
-                        refreshTable();
-                    } else {
-
-                        refresh();
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to delete");
-            }
-
+            deleteSelectedRecord();
         } else if (e.getSource() == updateButton) {
-            int selectedRow = table.getSelectedRow();
-            if (selectedRow != -1) {
-                int contactId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-                String fullName = userFullNameTextField.getText();
-                String email = userEmailTextField.getText();
-                String mobile = userMobileTextField.getText();
-                String subject = (subjectCombo.getSelectedItem() != null)
-                        ? subjectCombo.getSelectedItem().toString()
-                        : "";
-                String message = messageTextArea.getText();
+            updateSelectedRecord();
+        }
+    }
 
-                if (!fullName.isEmpty() && !email.isEmpty() && !mobile.isEmpty() && !subject.equals("Select your query type") && !message.isEmpty()) {
+    private void deleteSelectedRecord() {
+        int row = table.getSelectedRow();
 
-                    Contact contact = new Contact(contactId, fullName, email, mobile, subject, message);
-                    ContactDAO contactdao = new ContactDAO();
-                    int result = contactdao.updateById(contact);
-                    if (result > 0) {
-                        JOptionPane.showMessageDialog(null, "Record updated successfully!");
-                        refresh();
-                        refreshTable();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "No record found with that ID");
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please fill in all fields before updating");
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please select a row to update");
-            }
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a row to delete.");
+            return;
         }
 
+        int contactId = Integer.parseInt(valueAt(row, 0));
+
+        int response = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to delete this record?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (response != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        int result = new ContactDAO().deleteById(contactId);
+
+        if (result > 0) {
+            JOptionPane.showMessageDialog(this, "Record deleted successfully.");
+            clearFields();
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "The record could not be deleted.");
+        }
+    }
+
+    private void updateSelectedRecord() {
+        int row = table.getSelectedRow();
+
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a row to update.");
+            return;
+        }
+
+        String fullName = userFullNameTextField.getText().trim();
+        String email = userEmailTextField.getText().trim();
+        String phone = userMobileTextField.getText().trim();
+        String subject = String.valueOf(subjectCombo.getSelectedItem());
+        String message = messageTextArea.getText().trim();
+
+        if (fullName.isEmpty() || email.isEmpty() || phone.isEmpty()
+                || message.isEmpty() || DEFAULT_SUBJECT.equals(subject)) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            return;
+        }
+
+        int contactId = Integer.parseInt(valueAt(row, 0));
+        Contact updatedContact =
+                new Contact(contactId, fullName, email, phone, subject, message);
+
+        int result = new ContactDAO().updateById(updatedContact);
+
+        if (result > 0) {
+            JOptionPane.showMessageDialog(this, "Record updated successfully.");
+            clearFields();
+            refreshTable();
+        } else {
+            JOptionPane.showMessageDialog(this, "No record was updated.");
+        }
     }
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-
-        }
+        // Add subject selection handling here if needed.
     }
 
-public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        ContactGUI contact = new ContactGUI();
-        contact.setGUI();
-        contact.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        contact.setSize(1000, 900);
-        contact.setVisible(true);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+//            ContactDAO dao = new ContactDAO();
+//            dao.createTable();
 
-        ContactTable contactTable = new ContactTable(contact);
-        contactTable.setGui();
-        contactTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        contactTable.setSize(1000, 700);
-        contactTable.setVisible(true);
-    });
+            ContactTable contactTable = new ContactTable(null);
+            contactTable.setVisible(true);
+        });
+    }
 }
-
-}
-

@@ -303,7 +303,7 @@ public class ContactGUI extends JFrame implements ActionListener, ItemListener {
      
 
     ContactTable contactTable = new ContactTable(this);
-    contactTable.setGui();
+    //contactTable.setGui();
     contactTable.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     contactTable.setSize(1000, 700);
     contactTable.setLocationRelativeTo(this);

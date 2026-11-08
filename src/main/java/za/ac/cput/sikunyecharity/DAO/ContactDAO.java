@@ -49,7 +49,7 @@ public class ContactDAO {
                 + ")";
         try {
             statement = this.connection.createStatement();
-            statement.executeUpdate(dropTableSQL);
+          //  statement.executeUpdate(dropTableSQL);
             System.out.println("Existing table dropped.");
         } catch (SQLException ex) {
             Logger.getLogger(ContactDAO.class.getName()).log(Level.SEVERE, null, ex);
