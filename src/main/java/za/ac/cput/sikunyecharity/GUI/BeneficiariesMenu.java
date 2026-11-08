@@ -11,16 +11,42 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 public class BeneficiariesMenu extends JFrame implements ActionListener {
 
     private JButton btnBeneficiaries;
-    private JButton btnAssignments;
     private JButton btnBack;
+
+    public static boolean requireAdminLogin(JFrame parent) {
+        JPanel login = new JPanel(new GridLayout(2, 2, 8, 8));
+        JTextField username = new JTextField();
+        JPasswordField password = new JPasswordField();
+        login.add(new JLabel("Username:"));
+        login.add(username);
+        login.add(new JLabel("Password:"));
+        login.add(password);
+
+        int choice = JOptionPane.showConfirmDialog(parent, login,
+                "Beneficiaries Admin Login", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+        if (choice != JOptionPane.OK_OPTION) {
+            return false;
+        }
+        if ("admin".equals(username.getText().trim())
+                && "1234".equals(new String(password.getPassword()))) {
+            return true;
+        }
+        JOptionPane.showMessageDialog(parent, "Invalid username or password.",
+                "Access Denied", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
 
     public BeneficiariesMenu() {
         super("Sikunye Charity - Beneficiaries");
@@ -38,20 +64,17 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
         introduction.setOpaque(false);
         JLabel heading = new JLabel("Beneficiary management");
         heading.setFont(new Font("SansSerif", Font.BOLD, 20));
-        JLabel description = new JLabel("Choose a section to manage people and the support they need.");
+        JLabel description = new JLabel("Manage beneficiary records for the charity.");
         description.setFont(new Font("SansSerif", Font.PLAIN, 14));
         introduction.add(heading);
         introduction.add(description);
         content.add(introduction, BorderLayout.NORTH);
 
-        JPanel choices = new JPanel(new GridLayout(2, 1, 0, 17));
+        JPanel choices = new JPanel(new GridLayout(1, 1));
         choices.setOpaque(false);
         btnBeneficiaries = choice("Manage Beneficiaries",
                 "Add, view, update and remove beneficiary records.");
-        btnAssignments = choice("Manage Beneficiary Needs",
-                "Assign, update and remove needs for each beneficiary.");
         choices.add(btnBeneficiaries);
-        choices.add(btnAssignments);
         content.add(choices, BorderLayout.CENTER);
 
         JPanel bottom = new JPanel(new BorderLayout());
@@ -62,7 +85,6 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
         content.add(bottom, BorderLayout.SOUTH);
 
         btnBeneficiaries.addActionListener(this);
-        btnAssignments.addActionListener(this);
         btnBack.addActionListener(this);
 
         JScrollPane scrollPane = new JScrollPane(content);
@@ -100,8 +122,6 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
         JFrame next;
         if (source == btnBeneficiaries) {
             next = new BeneficiaryGui(this);
-        } else if (source == btnAssignments) {
-            next = new BeneficiaryNeedsGui(this);
         } else {
             return;
         }
@@ -110,6 +130,6 @@ public class BeneficiariesMenu extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new BeneficiariesMenu().setVisible(true));
+        SwingUtilities.invokeLater(() -> AppNavigation.open(null, "Beneficiaries"));
     }
 }

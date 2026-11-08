@@ -287,7 +287,7 @@ public class BeneficiaryGui extends JFrame implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new BeneficiaryGui().setVisible(true);
+                AppNavigation.open(null, "Beneficiaries");
             }
         });
     }
