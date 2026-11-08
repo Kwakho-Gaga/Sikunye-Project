@@ -8,7 +8,10 @@ public class Donation {
     
     private int donationID;
     private int donorID;
-    private int projectID;
+    // FIXED: Was int (201, 202) - now String (SSD, SSF, CCC)
+    // This is the FOREIGN KEY to ProjectTable(ProjectID)
+    // Can be null = General Fund
+    private String projectID;
     private String donationType;
     private BigDecimal amount;
     private String paymentStatus;
@@ -16,8 +19,12 @@ public class Donation {
     private boolean receiptGenerated;
     private Date dateReceived;
 
-    // Constructor
-    public Donation(int donationID, int donorID, int projectID, String donationType,
+    // Empty constructor
+    public Donation() {
+    }
+
+    // Main Constructor - ProjectID is now String
+    public Donation(int donationID, int donorID, String projectID, String donationType,
                     BigDecimal amount, String paymentStatus, Timestamp paymentDate,
                     boolean receiptGenerated, Date dateReceived) {
         this.donationID = donationID;
@@ -37,7 +44,8 @@ public class Donation {
     public int getDonorID() { 
         return donorID; 
     }
-    public int getProjectID() { 
+    // FIXED: Returns String now
+    public String getProjectID() { 
         return projectID; 
     }
     public String getDonationType() { 
@@ -65,7 +73,8 @@ public class Donation {
     public void setDonorID(int donorID) { 
         this.donorID = donorID; 
     }
-    public void setProjectID(int projectID) { 
+    // FIXED: Takes String now
+    public void setProjectID(String projectID) { 
         this.projectID = projectID; 
     }
     public void setDonationType(String donationType) { 
@@ -85,5 +94,14 @@ public class Donation {
     }
     public void setDateReceived(Date dateReceived) { 
         this.dateReceived = dateReceived; 
+    }
+
+    @Override
+    public String toString() {
+        return "Donation " + donationID
+                + " | DonorID=" + donorID
+                + " | ProjectID=" + (projectID == null ? "General Fund" : projectID)
+                + " | " + donationType
+                + " | R" + amount;
     }
 }
