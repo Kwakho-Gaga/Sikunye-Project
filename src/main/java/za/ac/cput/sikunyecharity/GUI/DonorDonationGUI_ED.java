@@ -9,6 +9,10 @@ import java.time.LocalDate;
 import za.ac.cput.sikunyecharity.DAO.DonorDonationDAOED;
 import za.ac.cput.sikunyecharity.DAO.DonorDonationDAOED.DonationLink;
 import za.ac.cput.sikunyecharity.Domain.Project;
+import za.ac.cput.sikunyecharity.DAO.ItemDonatedDAO;
+import za.ac.cput.sikunyecharity.Domain.ItemDonatedModel;
+import za.ac.cput.sikunyecharity.DAO.DonationItemDAO;
+import za.ac.cput.sikunyecharity.Domain.DonationItem;
 
 public class DonorDonationGUI_ED extends JFrame {
 
@@ -180,9 +184,9 @@ public class DonorDonationGUI_ED extends JFrame {
         location.add(postalCodeField);
         fields.add(location);
         provinceBox = new JComboBox<>(new String[]{
-                "Select Province", "Eastern Cape", "Free State", "Gauteng",
-                "KwaZulu-Natal", "Limpopo", "Mpumalanga", "Northern Cape",
-                "North West", "Western Cape"});
+            "Select Province", "Eastern Cape", "Free State", "Gauteng",
+            "KwaZulu-Natal", "Limpopo", "Mpumalanga", "Northern Cape",
+            "North West", "Western Cape"});
         provinceBox.setFont(new Font("Arial", Font.PLAIN, 9));
         fields.add(provinceBox);
         panel.add(fields, BorderLayout.CENTER);
@@ -269,11 +273,20 @@ public class DonorDonationGUI_ED extends JFrame {
         customAmountField.setForeground(Color.GRAY);
         customAmountField.setFont(new Font("Arial", Font.PLAIN, 9));
         customAmountField.addFocusListener(new FocusAdapter() {
-            @Override public void focusGained(FocusEvent e) {
-                if (customAmountField.getText().equals("ENTER AMOUNT")) { customAmountField.setText(""); customAmountField.setForeground(Color.BLACK); }
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (customAmountField.getText().equals("ENTER AMOUNT")) {
+                    customAmountField.setText("");
+                    customAmountField.setForeground(Color.BLACK);
+                }
             }
-            @Override public void focusLost(FocusEvent e) {
-                if (customAmountField.getText().trim().isEmpty()) { customAmountField.setText("ENTER AMOUNT"); customAmountField.setForeground(Color.GRAY); }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (customAmountField.getText().trim().isEmpty()) {
+                    customAmountField.setText("ENTER AMOUNT");
+                    customAmountField.setForeground(Color.GRAY);
+                }
             }
         });
         custom.add(rand, BorderLayout.WEST);
@@ -309,7 +322,8 @@ public class DonorDonationGUI_ED extends JFrame {
         projectBox = new JComboBox<>();
         projectBox.setFont(new Font("Arial", Font.PLAIN, 9));
         projectBox.setRenderer(new DefaultListCellRenderer() {
-            @Override public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 setText(value == null ? "General Fund" : ((Project) value).getName());
                 return this;
@@ -317,7 +331,9 @@ public class DonorDonationGUI_ED extends JFrame {
         });
         projectBox.addItem(null);
         try {
-            for (Project project : new DonorDonationDAOED().getProjects()) projectBox.addItem(project);
+            for (Project project : new DonorDonationDAOED().getProjects()) {
+                projectBox.addItem(project);
+            }
         } catch (SQLException ex) {
             projectBox.setEnabled(false);
             projectBox.setToolTipText("Could not load projects: " + ex.getMessage());
@@ -391,6 +407,7 @@ public class DonorDonationGUI_ED extends JFrame {
     }
 
     // FIXED: IN-KIND now behaves like every other page - no second window
+    // FIXED: No redirect, no login, saves ItemID to BOTH tables
     private void registerAndDonate() {
         try {
             String firstName = firstNameField.getText().trim();
@@ -400,7 +417,9 @@ public class DonorDonationGUI_ED extends JFrame {
             String street = addressField.getText().trim();
             String city = cityField.getText().trim();
             String province = (String) provinceBox.getSelectedItem();
-            if ("Select Province".equals(province)) province = "";
+            if ("Select Province".equals(province)) {
+                province = "";
+            }
             String postal = postalCodeField.getText().trim();
 
             if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phone.isEmpty() || street.isEmpty() || city.isEmpty() || postal.isEmpty()) {
@@ -417,51 +436,123 @@ public class DonorDonationGUI_ED extends JFrame {
                 return;
             }
 
+            // Map Donor combo -> ItemID for DONATIONITEM table only
+            // School supplies=1, Clothing=2, Food=3, Books=4, Blankets=5
+            int itemId = 0;
+            if (isInKind) {
+                switch (itemName) {
+                    case "School supplies":
+                        itemId = 1;
+                        break;
+                    case "Clothing":
+                        itemId = 2;
+                        break;
+                    case "Food":
+                        itemId = 3;
+                        break;
+                    case "Books":
+                        itemId = 4;
+                        break;
+                    case "Blankets":
+                        itemId = 5;
+                        break;
+                }
+            }
+
             double amount = 0;
             if (!isInKind) {
-                if (r50Button.isSelected()) amount = 50;
-                else if (r100Button.isSelected()) amount = 100;
-                else {
+                if (r50Button.isSelected()) {
+                    amount = 50;
+                } else if (r100Button.isSelected()) {
+                    amount = 100;
+                } else {
                     String t = customAmountField.getText().trim();
-                    if (t.isEmpty() || t.equals("ENTER AMOUNT")) { JOptionPane.showMessageDialog(this, "Please select R50, R100 or enter a custom amount."); return; }
+                    if (t.isEmpty() || t.equals("ENTER AMOUNT")) {
+                        JOptionPane.showMessageDialog(this, "Please select R50, R100 or enter a custom amount.");
+                        return;
+                    }
                     amount = Double.parseDouble(t);
                 }
             }
 
             String paymentMethod = "Card";
-            if (eftButton.isSelected()) paymentMethod = "EFT";
-            else if (cardButton.isSelected()) paymentMethod = "Card";
+            if (eftButton.isSelected()) {
+                paymentMethod = "EFT";
+            } else if (cardButton.isSelected()) {
+                paymentMethod = "Card";
+            }
 
             Project selectedProject = (Project) projectBox.getSelectedItem();
             String projectId = (selectedProject == null) ? null : selectedProject.getProjectId();
 
             DonorDonationDAOED dao = new DonorDonationDAOED();
             DonationLink link = dao.saveDonorAndDonation(
-                firstName, lastName, email, phone, street, city, province, postal,
-                amount, paymentMethod, LocalDate.now(), projectId, donationType,
-                itemName, itemQuantity
+                    firstName, lastName, email, phone, street, city, province, postal,
+                    amount, paymentMethod, LocalDate.now(), projectId, donationType,
+                    itemName, itemQuantity
             );
 
             if (isInKind) {
-                // NEW FLOW: Just a message, then normal navigation - NO new Dashboard window here
-                JOptionPane.showMessageDialog(this,
-                    "Thank you, " + firstName + "!\n\n"
-                    + "Your IN-KIND donation has been saved.\nDonation ID: " + link.getDonationId()
-                    + "\nItem: " + itemName + " (quantity: " + itemQuantity + ")\n\n"
-                    + "Continue to Donations Received and login to capture your In-Kind donation.",
-                    "Continue to Donations Received", JOptionPane.INFORMATION_MESSAGE);
+                // ---- POPULATE BOTH TABLES WITH SAME DONATION ----
 
-                // Tell Dashboard which donation to capture when it opens - Dashboard will prompt login once
-                DashboardGUI.setPendingInKindDonation(link.getDonationId());
+                // Table 1: DONATIONITEM = Donated Items Inventory (bottom table on Donations Received)
+                try {
+                    DonationItemDAO donationItemDao = new DonationItemDAO();
+                    if (!donationItemDao.itemExistsForDonation(link.getDonationId(), itemId)) {
+                        // DonationItem has no empty constructor - must use 5-arg constructor
+// 0 = DonationItemID, DAO will auto-generate it in addDonationItem()
+                        DonationItem di = new DonationItem(
+                                0, // DonationItemID - auto
+                                link.getDonationId(), // DonationID - e.g. 6
+                                itemId, // ItemID - e.g. 4 for Books
+                                itemQuantity, // Quantity - e.g. 6
+                                "Good" // Condition
+                        );
+                        donationItemDao.addDonationItem(di);
+                    }
+                } catch (Exception e1) {
+                    System.out.println("DONATIONITEM not saved: " + e1.getMessage());
+                }
+
+                // Table 2: ITEMS_DONATED = Items Donated / Item Received page
+                // ItemDonatedModel constructor from your ItemDonated.java:
+                // new ItemDonatedModel(receiptID, itemName, quantity, condition)
+                // itemID is Auto in this table, receiptID = DonationID links it to Table 1
+                try {
+    ItemDonatedDAO inventoryDao = new ItemDonatedDAO();
+    ItemDonatedModel inv = new ItemDonatedModel(
+            itemId,                 // ItemID - SAME as DONATIONITEM, e.g. 2 for Clothing
+            link.getDonationId(),   // receiptID = DonationID, e.g. 2
+            itemName,               // Clothing
+            itemQuantity,           // 500
+            "Good"                  // not "Not specified"
+    );
+    inventoryDao.addInventoryItem(inv);
+} catch (Exception e2) {
+    System.out.println("ITEMS_DONATED not saved: " + e2.getMessage());
+    e2.printStackTrace();
+}
+
+                // ---- JUST SHOW MESSAGE, STAY HERE - NO REDIRECT, NO LOGIN ----
+                JOptionPane.showMessageDialog(this,
+                        "Thank you, " + firstName + "!\n\n"
+                        + "Your IN-KIND donation has been saved.\n"
+                        + "Donor ID: " + link.getDonorId()
+                        + "\nProject ID: " + (link.getProjectId() == null ? "General Fund" : link.getProjectId())
+                        + "\nDonation ID: " + link.getDonationId()
+                        + "\nItem: " + itemName
+                        + "\nItem ID: " + itemId
+                        + "\nQuantity: " + itemQuantity,
+                        "Thank You", JOptionPane.INFORMATION_MESSAGE);
+
                 clearForm();
-                // SAME as HeaderPanel / Footer links - AppNavigation handles opening / reusing the window
-                AppNavigation.open(this, "Donations Received");
+                // DELETED: DashboardGUI.setPendingInKindDonation(...) + AppNavigation.open(...)
             } else {
                 JOptionPane.showMessageDialog(this,
-                    "Thank you, " + firstName + "!\n\n"
-                    + "Your donation has been saved.\nDonor ID: " + link.getDonorId()
-                    + "\nProject ID: " + (link.getProjectId() == null ? "General Fund" : link.getProjectId())
-                    + "\nAmount: R" + String.format("%.2f", amount));
+                        "Thank you, " + firstName + "!\n\n"
+                        + "Your donation has been saved.\nDonor ID: " + link.getDonorId()
+                        + "\nProject ID: " + (link.getProjectId() == null ? "General Fund" : link.getProjectId())
+                        + "\nAmount: R" + String.format("%.2f", amount));
                 clearForm();
             }
         } catch (NumberFormatException ex) {
@@ -497,7 +588,10 @@ public class DonorDonationGUI_ED extends JFrame {
     }
 
     private void navigateTo(String destination) {
-        if ("Donor".equals(destination)) { showDonatePage(); return; }
+        if ("Donor".equals(destination)) {
+            showDonatePage();
+            return;
+        }
         if ("DonationsRecieved".equals(destination)) {
             JFrame frame = new JFrame("Donation Management");
             DonationGUI donationsPage = new DonationGUI();
