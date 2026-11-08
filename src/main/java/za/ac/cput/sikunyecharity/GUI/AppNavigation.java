@@ -99,6 +99,9 @@ public static void link(JLabel label, String destination) {
 
             case "beneficiaries":
 
+                if (!BeneficiariesMenu.requireAdminLogin(current)) {
+                    return;
+                }
                 next = new BeneficiariesMenu();
                 break;
 
