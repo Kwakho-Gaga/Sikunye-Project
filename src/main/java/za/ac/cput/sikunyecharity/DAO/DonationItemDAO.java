@@ -36,6 +36,7 @@ public class DonationItemDAO {
             }
         }
     }
+    
 
     // FIX: Don't seed fake DonationIDs 102,103,105 - they violate FK and break getNextDonationItemID()
     public void seedInitialDonationItems() {
@@ -58,6 +59,14 @@ public class DonationItemDAO {
             stmt.setString(5, item.getCondition());
             stmt.executeUpdate();
         }
+    }
+
+    // UPDATED: Donor page calls this - auto-generates DonationItemID so you don't have to set it
+    public void addDonationItem(DonationItem item) throws SQLException {
+        if (item.getDonationItemID() <= 0) {
+            item.setDonationItemID(getNextDonationItemID());
+        }
+        insertDonationItem(item);
     }
 
     public DonationItem searchDonationItem(int donationItemID) throws SQLException {
