@@ -23,6 +23,8 @@ public class DonorDonationGUI_ED extends JFrame {
     private JComboBox<String> provinceBox;
     private JComboBox<Project> projectBox;
     private JComboBox<String> donationTypeCombo;
+    private JComboBox<String> itemNameCombo;
+    private JSpinner itemQuantitySpinner;
 
     private JRadioButton r50Button;
     private JRadioButton r100Button;
@@ -55,6 +57,7 @@ public class DonorDonationGUI_ED extends JFrame {
         contentPanel.setBackground(new Color(246, 240, 248));
         showDonatePage();
         mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(new FooterPanel(this), BorderLayout.SOUTH);
         setContentPane(mainPanel);
     }
 
@@ -66,11 +69,8 @@ public class DonorDonationGUI_ED extends JFrame {
         hero.setAlignmentX(Component.CENTER_ALIGNMENT);
         JPanel donationForm = createDonationForm();
         donationForm.setAlignmentX(Component.CENTER_ALIGNMENT);
-        JPanel inlineFooter = createInlineFooterPanel();
-        inlineFooter.setAlignmentX(Component.CENTER_ALIGNMENT);
         pageContent.add(hero);
         pageContent.add(donationForm);
-        pageContent.add(inlineFooter);
         JScrollPane pageScroll = new JScrollPane(pageContent, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         pageScroll.setBorder(null);
         pageScroll.getVerticalScrollBar().setUnitIncrement(16);
@@ -210,6 +210,34 @@ public class DonorDonationGUI_ED extends JFrame {
         content.add(donationTypeCombo);
         content.add(Box.createVerticalStrut(12));
 
+        JLabel itemTitle = new JLabel("ITEM TO DONATE");
+        itemTitle.setFont(new Font("Arial", Font.PLAIN, 10));
+        content.add(itemTitle);
+        content.add(Box.createVerticalStrut(5));
+        JPanel itemDonationPanel = new JPanel(new GridLayout(2, 2, 8, 3));
+        itemDonationPanel.setBackground(Color.WHITE);
+        JLabel itemNameLabel = new JLabel("ITEM");
+        JLabel itemQuantityLabel = new JLabel("QUANTITY");
+        itemNameLabel.setFont(new Font("Arial", Font.PLAIN, 8));
+        itemQuantityLabel.setFont(new Font("Arial", Font.PLAIN, 8));
+        itemNameCombo = new JComboBox<>(new String[]{
+            "Select item", "School supplies", "Clothing", "Food", "Books", "Blankets"
+        });
+        itemNameCombo.setFont(new Font("Arial", Font.PLAIN, 9));
+        itemQuantitySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 10000, 1));
+        itemQuantitySpinner.setFont(new Font("Arial", Font.PLAIN, 9));
+        itemDonationPanel.add(itemNameLabel);
+        itemDonationPanel.add(itemQuantityLabel);
+        itemDonationPanel.add(itemNameCombo);
+        itemDonationPanel.add(itemQuantitySpinner);
+        itemTitle.setEnabled(false);
+        itemNameLabel.setEnabled(false);
+        itemQuantityLabel.setEnabled(false);
+        itemNameCombo.setEnabled(false);
+        itemQuantitySpinner.setEnabled(false);
+        content.add(itemDonationPanel);
+        content.add(Box.createVerticalStrut(12));
+
         JLabel amountTitle = new JLabel("▣   DONATION AMOUNT");
         amountTitle.setFont(new Font("Arial", Font.PLAIN, 10));
         content.add(amountTitle);
@@ -258,6 +286,11 @@ public class DonorDonationGUI_ED extends JFrame {
             r50Button.setEnabled(!isInKind);
             r100Button.setEnabled(!isInKind);
             customAmountField.setEnabled(!isInKind);
+            itemTitle.setEnabled(isInKind);
+            itemNameLabel.setEnabled(isInKind);
+            itemQuantityLabel.setEnabled(isInKind);
+            itemNameCombo.setEnabled(isInKind);
+            itemQuantitySpinner.setEnabled(isInKind);
             if (isInKind) {
                 r50Button.setSelected(false);
                 r100Button.setSelected(false);
@@ -377,6 +410,12 @@ public class DonorDonationGUI_ED extends JFrame {
 
             String donationType = (String) donationTypeCombo.getSelectedItem();
             boolean isInKind = "IN-KIND".equals(donationType);
+            String itemName = isInKind ? (String) itemNameCombo.getSelectedItem() : null;
+            int itemQuantity = isInKind ? ((Number) itemQuantitySpinner.getValue()).intValue() : 0;
+            if (isInKind && (itemName == null || "Select item".equals(itemName))) {
+                JOptionPane.showMessageDialog(this, "Please choose the item being donated.");
+                return;
+            }
 
             double amount = 0;
             if (!isInKind) {
@@ -399,14 +438,16 @@ public class DonorDonationGUI_ED extends JFrame {
             DonorDonationDAOED dao = new DonorDonationDAOED();
             DonationLink link = dao.saveDonorAndDonation(
                 firstName, lastName, email, phone, street, city, province, postal,
-                amount, paymentMethod, LocalDate.now(), projectId, donationType
+                amount, paymentMethod, LocalDate.now(), projectId, donationType,
+                itemName, itemQuantity
             );
 
             if (isInKind) {
                 // NEW FLOW: Just a message, then normal navigation - NO new Dashboard window here
                 JOptionPane.showMessageDialog(this,
                     "Thank you, " + firstName + "!\n\n"
-                    + "Your IN-KIND donation has been saved.\nDonation ID: " + link.getDonationId() + "\n\n"
+                    + "Your IN-KIND donation has been saved.\nDonation ID: " + link.getDonationId()
+                    + "\nItem: " + itemName + " (quantity: " + itemQuantity + ")\n\n"
                     + "Continue to Donations Received and login to capture your In-Kind donation.",
                     "Continue to Donations Received", JOptionPane.INFORMATION_MESSAGE);
 
@@ -442,6 +483,8 @@ public class DonorDonationGUI_ED extends JFrame {
         provinceBox.setSelectedIndex(0);
         projectBox.setSelectedIndex(0);
         donationTypeCombo.setSelectedIndex(0);
+        itemNameCombo.setSelectedIndex(0);
+        itemQuantitySpinner.setValue(1);
         r50Button.setSelected(false);
         r100Button.setSelected(false);
         r50Button.setEnabled(true);
@@ -451,14 +494,6 @@ public class DonorDonationGUI_ED extends JFrame {
         customAmountField.setText("ENTER AMOUNT");
         customAmountField.setForeground(Color.GRAY);
         customAmountField.setEnabled(true);
-    }
-
-    private JPanel createInlineFooterPanel() {
-        JPanel footerPanel = new JPanel(new BorderLayout());
-        footerPanel.setBackground(new Color(27, 38, 46));
-        footerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260));
-        footerPanel.add(new JLabel("© 2026 Sikunye Charity. All rights reserved.", SwingConstants.CENTER), BorderLayout.CENTER);
-        return footerPanel;
     }
 
     private void navigateTo(String destination) {

@@ -142,8 +142,23 @@ public class DonorDonationDAOED {
             double amount, String paymentMethod, LocalDate donationDate, String projectId,
             String donationType
     ) throws SQLException {
+        return saveDonorAndDonation(firstName, lastName, email, phoneNumber,
+                streetAddress, city, province, postalCode, amount, paymentMethod,
+                donationDate, projectId, donationType, null, 0);
+    }
+
+    public DonationLink saveDonorAndDonation(
+            String firstName, String lastName, String email, String phoneNumber,
+            String streetAddress, String city, String province, String postalCode,
+            double amount, String paymentMethod, LocalDate donationDate, String projectId,
+            String donationType, String itemName, int itemQuantity
+    ) throws SQLException {
         if (donationType == null || donationType.isBlank()) donationType = "FINANCIAL";
         donationType = donationType.toUpperCase();
+        if ("IN-KIND".equals(donationType)
+                && (itemName == null || itemName.isBlank() || itemQuantity <= 0)) {
+            throw new IllegalArgumentException("Choose an item and quantity for an in-kind donation.");
+        }
         if ("FINANCIAL".equals(donationType) && amount <= 0) {
             throw new IllegalArgumentException("Donation amount must be greater than zero.");
         }
@@ -160,6 +175,16 @@ public class DonorDonationDAOED {
                 insertDonor(connection, donorId, firstName, lastName, email, phoneNumber, streetAddress, city, province, postalCode);
                 int donationId = nextId(connection, "DONATION", "DONATIONID");
                 insertDonation(connection, donationId, donorId, amount, paymentMethod, donationDate, projectId, donationType);
+                if ("IN-KIND".equals(donationType)) {
+                    try (PreparedStatement itemStatement = connection.prepareStatement(
+                            "INSERT INTO ITEMS_DONATED (receiptID, itemName, quantity, itemCondition) VALUES (?, ?, ?, ?)")) {
+                        itemStatement.setInt(1, donationId);
+                        itemStatement.setString(2, itemName);
+                        itemStatement.setInt(3, itemQuantity);
+                        itemStatement.setString(4, "Not specified");
+                        itemStatement.executeUpdate();
+                    }
+                }
                 connection.commit();
                 return new DonationLink(donationId, donorId, projectId, donationType);
             } catch (SQLException ex) {
